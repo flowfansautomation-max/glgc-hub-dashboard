@@ -15,11 +15,15 @@
 
   // Raw list, exactly as given. phone: null means "No phone".
   var RAW = [
+    // Magdalene (0551483689) and Betty Marcella (0596524798) also appeared here,
+    // but each is the SAME person (same phone) listed under another governor —
+    // Magdalene under Perfect Love / David Aseda, Betty Marcella under Steadfast /
+    // Joanita (her "Teiman" hub). Removed the duplicate copies from MK's hub.
     { choir: 'Love Is Large Choir', governor: 'MK', shepherds: [
       ['MK', '0560332094'], ['Grace', '0243009116'], ['Cindy', '0245599923'],
       ['Patra Amoako', '0550560424'], ['Dorothy Duvor', null], ['Eyram', null],
-      ['Magdalene', '0551483689'], ['Lucia Adusei', '0549556476'], ['Wilhermina', '0597229553'],
-      ['Janet Thomas', '0256875377'], ['Asabea', '0593621222'], ['Betty Marcella', '0596524798'],
+      ['Lucia Adusei', '0549556476'], ['Wilhermina', '0597229553'],
+      ['Janet Thomas', '0256875377'], ['Asabea', '0593621222'],
       ['Cherry', '0551984813'] ] },
 
     { choir: 'Love Is Large Choir', governor: 'Christiana Dzekoe', shepherds: [
