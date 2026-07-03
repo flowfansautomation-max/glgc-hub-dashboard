@@ -268,34 +268,19 @@
         shepStats.style.display = 'none';
         awaiting.style.display = 'block';
         awaiting.innerHTML = (sel.level === 'shepherd')
-          ? 'Per-shepherd attendance will appear here once your <b>Sunday form</b> is collecting it.<br>For now, pick a <b>governor</b> or <b>choir</b> to see the real hub numbers.'
+          ? 'No individual data for this shepherd yet — they haven’t led a rehearsal.<br>Per-shepherd <b>Sunday attendance</b> starts once your new form is collecting it.'
           : 'No attendance has been recorded for this hub in the sheets yet.';
         return;
       }
       awaiting.style.display = 'none';
       charts.style.display = 'block';
 
-      if (sel.level === 'shepherd') {
-        // Individual: present/absent (1/0) bars, summary cards, no offering.
-        shepStats.style.display = 'flex';
-        shepStats.innerHTML =
-          '<div class="stat"><div class="n" style="color:var(--blue)">' + e.satPresent + '/' + e.weeksTracked +
-            '</div><div class="l">Rehearsals present · ' + e.satRate + '%</div></div>' +
-          '<div class="stat"><div class="n" style="color:var(--sun)">' + e.sunPresent + '/' + e.weeksTracked +
-            '</div><div class="l">Sundays present · ' + e.sunRate + '%</div></div>';
-        legOff.style.display = 'none';
-        document.getElementById('legRehTxt').textContent = 'Present (rehearsal)';
-        var pts = filterWeeks(MODEL.weeks.map(function (w) {
-          var r = e.rec[w.week] || {};
-          return { week:w.week, label:w.label, sat: r.sat ? 1 : 0, sun: r.sun ? 1 : 0 };
-        }));
-        renderShepherd(pts);
-      } else {
-        shepStats.style.display = 'none';
-        legOff.style.display = '';
-        document.getElementById('legRehTxt').textContent = 'Rehearsal attendance';
-        renderAggregate(filterWeeks(e.points));
-      }
+      // Hubs and individual shepherds render the same way now — shepherds show
+      // their own rehearsal turnout + offering (Sunday per-shepherd isn't tracked yet).
+      shepStats.style.display = 'none';
+      legOff.style.display = '';
+      document.getElementById('legRehTxt').textContent = 'Rehearsal attendance';
+      renderAggregate(filterWeeks(e.points));
     }
 
     function weekLabels(pts) {

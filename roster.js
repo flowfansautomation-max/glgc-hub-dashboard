@@ -15,16 +15,15 @@
 
   // Raw list, exactly as given. phone: null means "No phone".
   var RAW = [
-    // Magdalene (0551483689) and Betty Marcella (0596524798) also appeared here,
-    // but each is the SAME person (same phone) listed under another governor —
-    // Magdalene under Perfect Love / David Aseda, Betty Marcella under Steadfast /
-    // Joanita (her "Teiman" hub). Removed the duplicate copies from MK's hub.
-    { choir: 'Love Is Large Choir', governor: 'MK', shepherds: [
-      ['MK', '0560332094'], ['Grace', '0243009116'], ['Cindy', '0245599923'],
+    // Kiki Heward-Mills (a.k.a. "MK"). Magdalene (0551483689) is the SAME person as
+    // the one under Perfect Love / David Aseda — kept out of this hub. Betty Marcella
+    // (0596524798) belongs here (removed from Joanita's list per correction).
+    { choir: 'Love Is Large Choir', governor: 'Kiki Heward-Mills', shepherds: [
+      ['Kiki Heward-Mills', '0560332094'], ['Grace', '0243009116'], ['Cindy', '0245599923'],
       ['Patra Amoako', '0550560424'], ['Dorothy Duvor', null], ['Eyram', null],
       ['Lucia Adusei', '0549556476'], ['Wilhermina', '0597229553'],
       ['Janet Thomas', '0256875377'], ['Asabea', '0593621222'],
-      ['Cherry', '0551984813'] ] },
+      ['Betty Marcella', '0596524798'], ['Cherry', '0551984813'] ] },
 
     { choir: 'Love Is Large Choir', governor: 'Christiana Dzekoe', shepherds: [
       ['Grace', '0535231068'], ['Abraham', '0533421056'] ] },
@@ -79,9 +78,10 @@
       ['Augustina Andaful', '0554435322'], ['Joanna Shella Aba', '0544288871'],
       ['Famous Klutse', '0599900246'], ['Fortune Esedinam Adiraki Gbolo', '0205508004'] ] },
 
+    // Betty Marcella (0596524798) removed — she belongs to Kiki's hub (same person).
     { choir: 'Steadfast Love Choir', governor: 'Joanita Djabatey', shepherds: [
       ['Joanita', '0553833171'], ['Ewuradjoa Asirifi', null], ['Kingsley Boadu', '0551986770'],
-      ['Roland', '0554078115'], ['Papa Yaw', '0551130050'], ['Betty Marcella', '0596524798'],
+      ['Roland', '0554078115'], ['Papa Yaw', '0551130050'],
       ['Gloria Budu', '0541737442'], ['Portia Danquah', '0535552533'] ] },
 
     { choir: 'True Love Choir', governor: 'Dorcas Longdon', shepherds: [

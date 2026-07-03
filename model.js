@@ -17,7 +17,7 @@ window.GLGC = (function () {
   // Normalized sheet name -> your roster governor's display name.
   // Handles the spelling differences between the sheets and your list.
   var SHEET_TO_GOV = {
-    'kiki heward-mills':'MK', 'kiki heward mills':'MK',   // MK = Kiki Heward-Mills
+    'kiki heward-mills':'Kiki Heward-Mills', 'kiki heward mills':'Kiki Heward-Mills',
     'lois dorothy nteful':'Lois Nterful', 'lois nterful':'Lois Nterful', 'lois nteful':'Lois Nterful',
     'ninette dodoo':'Ninette Dodoo',
     'keziah ogoe':'Keziah Ogoe', 'kezia ogoe':'Keziah Ogoe',
@@ -52,7 +52,7 @@ window.GLGC = (function () {
     'stephanie bediako':'Stephanie Bediako', 'david aseda':'David Aseda Orleans-Lindsay',
     // shepherds who led a rehearsal -> their governor
     'grace fianu':'Christiana Dzekoe',           // Mempeasem
-    'janet thomas':'MK',                          // First Love Center
+    'janet thomas':'Kiki Heward-Mills',           // First Love Center
     'pascaline obaze':'Claudia Quayson',          // Manhea
     'princess kanu':'Claudia Quayson',            // Ablaykuma
     'elizabeth akakpo':'Claudia Quayson',         // Kasoa
@@ -61,6 +61,32 @@ window.GLGC = (function () {
     'lina yartey':'Michelle William-Addo',        // Taifa
     'lovelace dadzie':'Dorcas Longdon',           // Kolebu
     'ayikaikor ankrah':'—', 'sharon-rose nartey':'—'   // Jesus Night hub
+  };
+
+  // Same rehearsal rows, but attributed to the individual SHEPHERD who led them,
+  // so each shepherd's own rehearsal turnout + offering shows on their page.
+  // [governor, shepherd name]  (governor-led rows land on the governor's own entry)
+  var SAT_TO_SHEP = {
+    'grace fianu':['Christiana Dzekoe','Grace'],
+    'janet thomas':['Kiki Heward-Mills','Janet Thomas'],
+    'pascaline obaze':['Claudia Quayson','Pascaline'],
+    'princess kanu':['Claudia Quayson','Princess'],
+    'elizabeth akakpo':['Claudia Quayson','Elizabeth'],
+    'claudia apaloo':['Claudia Quayson','Claudia'],
+    'celine ayitey':['Lois Nterful','Celine'],
+    'lina yartey':['Michelle William-Addo','Lina'],
+    'lovelace dadzie':['Dorcas Longdon','Lovelace Dadzie'],
+    'ayikaikor ankrah':['—','Ayikaikor Ankrah'],
+    'sharon-rose nartey':['—','Sharon Rose Nartey'],
+    'dorcas longdon':['Dorcas Longdon','Dorcas Longdon'],
+    'hannah-joy adade':['Hannah-Joy Adade','Hannah Joy'],
+    'joanita djabatey':['Joanita Djabatey','Joanita'],
+    'johanna nakoja':['Johanna Nakoja','Johanna Nakoja'],
+    'kezia ogoe':['Keziah Ogoe','Keziah'],
+    'lois nterful':['Lois Nterful','Lois'],
+    'michelle william-addo':['Michelle William-Addo','Michelle'],
+    'stephanie bediako':['Stephanie Bediako','Stephanie'],
+    'david aseda':['David Aseda Orleans-Lindsay','Aseda']
   };
 
   function norm(s){ return String(s == null ? '' : s).toLowerCase().replace(/\s+/g,' ').trim(); }
@@ -148,9 +174,9 @@ window.GLGC = (function () {
     var rows=[];
     (resp.table.rows||[]).forEach(function(r){
       var c=r.c||[];
-      var gov=SAT_TO_GOV[norm(c[iLeader]&&c[iLeader].v)]; if(!gov) return;
+      var leader=norm(c[iLeader]&&c[iLeader].v); if(!leader) return;
       var d=parseGvizDate(c[iDate]&&c[iDate].v); if(!d) return;
-      rows.push({ gov:gov, date:d,
+      rows.push({ leader:leader, date:d,
         att:+(c[iAtt]&&c[iAtt].v)||0, off:+(c[iOff]&&c[iOff].v)||0 });
     });
     return rows;
@@ -164,25 +190,41 @@ window.GLGC = (function () {
       return { week:isoWeek(sunD), sunDate:sunD, satDate:satD,
                sunLabel:fmt(sunD), satLabel:fmt(satD), label:'WK '+isoWeek(sunD)+' · '+fmt(sunD) };
     });
-    // Saturday totals per governor per week index (match by nearest Sunday, ≤4 days)
-    var satByGov={};
-    sat.forEach(function(row){
+    // week index for a rehearsal date (nearest Sunday within 4 days)
+    function weekIndexFor(date){
       var best=-1, bestGap=5;
-      weeks.forEach(function(w,i){
-        var gap=Math.abs(w.sunDate-row.date)/86400000;
-        if(gap<bestGap){ bestGap=gap; best=i; }
-      });
-      if(best<0) return;
-      var g=satByGov[row.gov]||(satByGov[row.gov]={});
-      var cell=g[best]||(g[best]={att:0,off:0}); cell.att+=row.att; cell.off+=row.off;
+      weeks.forEach(function(w,i){ var gap=Math.abs(w.sunDate-date)/86400000; if(gap<bestGap){ bestGap=gap; best=i; } });
+      return best;
+    }
+
+    // shepherds skeleton + a (governor|name -> shepherd) lookup for attribution
+    var shepByKey={};
+    var shepherds=ROSTER.shepherds.map(function(s){
+      var o={ id:s.id, name:s.name, phone:s.phone, choir:s.choir,
+        governor:s.governor, governorId:s.governorId, photoKey:s.photoKey, _sat:{} };
+      shepByKey[s.governor+'|'+s.name]=o;
+      return o;
     });
 
-    // shepherds — no per-person data source yet, so blank
-    var shepherds=ROSTER.shepherds.map(function(s){
-      return { id:s.id, name:s.name, phone:s.phone, choir:s.choir,
-        governor:s.governor, governorId:s.governorId, photoKey:s.photoKey,
-        rec:{}, satPresent:0, sunPresent:0, weeksTracked:0,
-        satRate:0, sunRate:0, hasData:false };
+    // aggregate each rehearsal row onto its hub (governor) AND the leader (shepherd)
+    var satByGov={};
+    sat.forEach(function(row){
+      var i=weekIndexFor(row.date); if(i<0) return;
+      var gov=SAT_TO_GOV[row.leader];
+      if(gov){ var g=satByGov[gov]||(satByGov[gov]={}); var cg=g[i]||(g[i]={att:0,off:0}); cg.att+=row.att; cg.off+=row.off; }
+      var sk=SAT_TO_SHEP[row.leader];
+      if(sk){ var so=shepByKey[sk[0]+'|'+sk[1]]; if(so){ var cs=so._sat[i]||(so._sat[i]={att:0,off:0}); cs.att+=row.att; cs.off+=row.off; } }
+    });
+
+    // shepherd points — their own rehearsal turnout + offering (Sunday per-shepherd not tracked yet)
+    shepherds.forEach(function(s){
+      s.points=weeks.map(function(w,i){
+        var c=s._sat[i];
+        return { week:w.week, label:w.label, satPresent:(c?c.att:null),
+                 offering:(c?c.off:null), sunPresent:null, roster:1 };
+      });
+      s.hasData=s.points.some(function(p){ return p.satPresent!=null||p.offering!=null; });
+      delete s._sat;
     });
     var byId={}; shepherds.forEach(function(s){ byId[s.id]=s; });
 
