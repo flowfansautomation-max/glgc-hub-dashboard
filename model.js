@@ -38,6 +38,30 @@ window.GLGC = (function () {
     'emmanuel owiredu':'Emmanuel Owiredu'
   };
 
+  // Saturday rehearsal LEADER -> roster governor. Many rehearsals are led by a
+  // shepherd, not the governor, so this maps each leader to the hub they belong
+  // to (per your list, confirmed by location where names repeat). Unknown leaders
+  // are left out until added here.
+  var SAT_TO_GOV = {
+    // governors leading their own hub's rehearsal
+    'christiana dzekoe':'Christiana Dzekoe', 'dorcas longdon':'Dorcas Longdon',
+    'hannah-joy adade':'Hannah-Joy Adade', 'joanita djabatey':'Joanita Djabatey',
+    'johanna nakoja':'Johanna Nakoja', 'kezia ogoe':'Keziah Ogoe', 'keziah ogoe':'Keziah Ogoe',
+    'lois nterful':'Lois Nterful', 'michelle william-addo':'Michelle William-Addo',
+    'stephanie bediako':'Stephanie Bediako', 'david aseda':'David Aseda Orleans-Lindsay',
+    // shepherds who led a rehearsal -> their governor
+    'grace fianu':'Christiana Dzekoe',           // Mempeasem
+    'janet thomas':'MK',                          // First Love Center
+    'pascaline obaze':'Claudia Quayson',          // Manhea
+    'princess kanu':'Claudia Quayson',            // Ablaykuma
+    'elizabeth akakpo':'Claudia Quayson',         // Kasoa
+    'claudia apaloo':'Claudia Quayson',
+    'celine ayitey':'Lois Nterful',
+    'lina yartey':'Michelle William-Addo',        // Taifa
+    'lovelace dadzie':'Dorcas Longdon',           // Kolebu
+    'ayikaikor ankrah':'—', 'sharon-rose nartey':'—'   // Jesus Night hub
+  };
+
   function norm(s){ return String(s == null ? '' : s).toLowerCase().replace(/\s+/g,' ').trim(); }
   function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
 
@@ -123,7 +147,7 @@ window.GLGC = (function () {
     var rows=[];
     (resp.table.rows||[]).forEach(function(r){
       var c=r.c||[];
-      var gov=SHEET_TO_GOV[norm(c[iLeader]&&c[iLeader].v)]; if(!gov) return;
+      var gov=SAT_TO_GOV[norm(c[iLeader]&&c[iLeader].v)]; if(!gov) return;
       var d=parseGvizDate(c[iDate]&&c[iDate].v); if(!d) return;
       rows.push({ gov:gov, date:d,
         att:+(c[iAtt]&&c[iAtt].v)||0, off:+(c[iOff]&&c[iOff].v)||0 });

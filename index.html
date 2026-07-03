@@ -99,7 +99,6 @@
       <div class="leader" id="leader">Loading…</div>
       <div class="choirName" id="choirName"></div>
       <div class="meta" id="metaLine"></div>
-      <div class="membership" id="membership" style="display:none"></div>
     </div>
 
     <!-- shepherd-only summary cards -->
@@ -229,7 +228,6 @@
     function render() {
       if (!MODEL) return;
       var sel = selection(), e = sel.e;
-      var memBadge = document.getElementById('membership');
       var shepStats = document.getElementById('shepStats');
       var legOff = document.getElementById('legOff');
 
@@ -253,9 +251,6 @@
       cn.textContent = (choirName && choirName.toUpperCase() !== name.toUpperCase()) ? choirName : '';
       cn.style.display = cn.textContent ? 'block' : 'none';
       document.getElementById('metaLine').innerHTML = meta;
-
-      if (showMem) { memBadge.style.display = ''; memBadge.innerHTML = 'Total Membership: <b>' + e.membership + '</b>'; }
-      else memBadge.style.display = 'none';
 
       if (sel.level === 'ministry') {
         document.getElementById('avatar').style.display = 'none';
