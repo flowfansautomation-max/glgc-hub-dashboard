@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GLGC Hub Dashboard — All Hubs</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="roster.js"></script>
+  <script src="model.js"></script>
+  <style>
+    :root { --blue:#1f5fff; --gold:#e6c878; --green:#38b26a; }
+    * { box-sizing:border-box; }
+    html, body { margin:0; background:#000; color:#fff; font-family:Arial, Helvetica, sans-serif; }
+    .wrap { max-width:1100px; margin:0 auto; padding:14px 22px 50px; }
+    .nav { display:flex; gap:10px; justify-content:center; margin-bottom:10px; flex-wrap:wrap; }
+    .nav a { color:#bbb; text-decoration:none; border:1px solid #333; border-radius:20px; padding:7px 16px; font-size:14px; }
+    .nav a.active { background:var(--gold); color:#000; border-color:var(--gold); font-weight:bold; }
+    .title { text-align:center; font-family:Georgia,serif; color:var(--gold); font-size:30px; margin:6px 0 4px; }
+    .sub { text-align:center; color:#8a8a8a; font-size:13px; margin-bottom:14px; }
+    .topbar { display:flex; gap:12px; justify-content:center; margin-bottom:8px; flex-wrap:wrap; }
+    select { background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:9px 12px; font-size:15px; }
+    .chartbox { height:560px; margin-top:14px; }
+    .msg { text-align:center; color:#888; padding:40px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <a href="index.html">Per Hub</a>
+      <a href="all.html" class="active">All Hubs</a>
+      <a href="summary.html">Weekly Summary</a>
+    </div>
+    <div class="title">ALL HUBS COMPARED</div>
+    <div class="sub">Every hub side by side for one week — sorted highest to lowest</div>
+    <div class="topbar">
+      <select id="week" onchange="render()"></select>
+      <select id="view" onchange="render()">
+        <option value="gov">By governor (hub)</option>
+        <option value="choir">By choir</option>
+      </select>
+      <select id="metric" onchange="render()">
+        <option value="satPresent">Saturday attendance</option>
+        <option value="sunPresent">Sunday attendance</option>
+        <option value="offering">Offering (GHS)</option>
+      </select>
+    </div>
+    <div class="chartbox"><canvas id="chart"></canvas></div>
+    <div class="msg" id="msg" style="display:none">No data.</div>
+  </div>
+
+  <script>
+    var MODEL = null, chart = null;
+    GLGC.load(function (m) {
+      MODEL = m;
+      var wk = document.getElementById('week');
+      MODEL.weeks.forEach(function (w, i) {
+        var o = document.createElement('option'); o.value = i; o.textContent = w.label;
+        wk.appendChild(o);
+      });
+      wk.value = MODEL.weeks.length - 1;   // latest week
+      render();
+    }, function (e) { console.error(e); });
+
+    function colorFor(metric) {
+      return metric === 'sunPresent' ? '#38b26a' : metric === 'offering' ? '#e6c878' : '#1f5fff';
+    }
+
+    function render() {
+      if (!MODEL) return;
+      var wi = +document.getElementById('week').value;
+      var view = document.getElementById('view').value;
+      var metric = document.getElementById('metric').value;
+      var groups = view === 'choir' ? MODEL.choirs : MODEL.governors;
+
+      var rows = groups.map(function (g) {
+        var label = view === 'choir' ? g.choir : g.governor + '  (' + g.choir.replace(/ Choir| Singers/,'') + ')';
+        return { label: label, v: g.points[wi][metric] };
+      }).filter(function (r) { return r.v != null; })
+        .sort(function (a, b) { return b.v - a.v; });
+
+      document.getElementById('msg').style.display = rows.length ? 'none' : 'block';
+      document.getElementById('chart').parentNode.style.height = Math.max(360, rows.length * 30 + 80) + 'px';
+
+      var cfg = {
+        type: 'bar',
+        plugins: [GLGC.valueLabelsH],
+        data: { labels: rows.map(function(r){return r.label;}),
+          datasets: [{ label: metric, data: rows.map(function(r){return r.v;}),
+            backgroundColor: colorFor(metric), borderRadius:3, maxBarThickness:26 }] },
+        options: {
+          indexAxis: 'y', responsive:true, maintainAspectRatio:false,
+          plugins:{ legend:{display:false} },
+          scales:{
+            x:{ beginAtZero:true, grace:'8%', ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} },
+            y:{ ticks:{color:'#ddd',font:{size:12}}, grid:{color:'#141414'} }
+          }
+        }
+      };
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById('chart'), cfg);
+    }
+  </script>
+</body>
+</html>
