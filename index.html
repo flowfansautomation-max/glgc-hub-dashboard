@@ -60,6 +60,11 @@
     .sw { width:24px; height:13px; border-radius:2px; display:inline-block; }
     .chartbox { height:300px; margin-top:6px; }
     .msg { text-align:center; color:#888; padding:30px; font-size:16px; }
+    .note { text-align:center; color:#9a9a9a; padding:46px 22px; font-size:16px; line-height:1.6;
+      background:#0c0c0c; border:1px solid #222; border-radius:12px; margin-top:26px; }
+    .note b { color:var(--gold); }
+    .chart-empty { color:#777; font-size:15px; text-align:center; padding:66px 20px;
+      border:1px dashed #2a2a2a; border-radius:12px; margin-top:6px; }
 
     /* shepherd summary cards */
     .stats { display:flex; gap:14px; justify-content:center; margin:6px 0 2px; flex-wrap:wrap; }
@@ -101,22 +106,27 @@
     <div id="shepStats" class="stats" style="display:none"></div>
 
     <!-- two stacked charts: rehearsal on top, sunday on bottom -->
-    <div class="section">
-      <div class="section-label">🎼 Rehearsal Attendance</div>
-      <div class="legend">
-        <span><i class="sw" style="background:var(--blue)"></i> <span id="legRehTxt">Rehearsal attendance</span></span>
-        <span id="legOff"><i class="sw" style="background:var(--red)"></i> Offering (GHS)</span>
+    <div id="charts">
+      <div class="section">
+        <div class="section-label">🎼 Rehearsal Attendance</div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--blue)"></i> <span id="legRehTxt">Rehearsal attendance</span></span>
+          <span id="legOff"><i class="sw" style="background:var(--red)"></i> Offering (GHS)</span>
+        </div>
+        <div class="chartbox" id="rehBox"><canvas id="chartReh"></canvas></div>
+        <div class="chart-empty" id="rehEmpty" style="display:none">No rehearsal attendance recorded for this period yet.</div>
       </div>
-      <div class="chartbox"><canvas id="chartReh"></canvas></div>
-    </div>
-    <div class="section">
-      <div class="section-label">⛪ Sunday Attendance</div>
-      <div class="legend">
-        <span><i class="sw" style="background:var(--sun)"></i> Sunday attendance</span>
+      <div class="section">
+        <div class="section-label">⛪ Sunday Attendance</div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--sun)"></i> Sunday attendance</span>
+        </div>
+        <div class="chartbox" id="sunBox"><canvas id="chartSun"></canvas></div>
+        <div class="chart-empty" id="sunEmpty" style="display:none">No Sunday attendance recorded for this period yet.</div>
       </div>
-      <div class="chartbox"><canvas id="chartSun"></canvas></div>
     </div>
-    <div class="msg" id="msg" style="display:none">No data yet.</div>
+
+    <div id="awaiting" class="note" style="display:none"></div>
   </div>
 
   <script>
@@ -254,6 +264,22 @@
         GLGC.setAvatar(document.getElementById('avatar'), document.getElementById('initials'), key, name);
       }
 
+      // Show a clear note instead of empty axes when there's no real data.
+      var charts = document.getElementById('charts');
+      var awaiting = document.getElementById('awaiting');
+      var hasData = (sel.level === 'ministry') ? true : !!e.hasData;
+      if (!hasData) {
+        charts.style.display = 'none';
+        shepStats.style.display = 'none';
+        awaiting.style.display = 'block';
+        awaiting.innerHTML = (sel.level === 'shepherd')
+          ? 'Per-shepherd attendance will appear here once your <b>Sunday form</b> is collecting it.<br>For now, pick a <b>governor</b> or <b>choir</b> to see the real hub numbers.'
+          : 'No attendance has been recorded for this hub in the sheets yet.';
+        return;
+      }
+      awaiting.style.display = 'none';
+      charts.style.display = 'block';
+
       if (sel.level === 'shepherd') {
         // Individual: present/absent (1/0) bars, summary cards, no offering.
         shepStats.style.display = 'flex';
@@ -282,15 +308,24 @@
     }
 
     // Hub / choir / ministry: people counts + offering.
+    function toggle(boxId, emptyId, has) {
+      document.getElementById(boxId).style.display = has ? '' : 'none';
+      document.getElementById(emptyId).style.display = has ? 'none' : 'block';
+    }
+
     function renderAggregate(pts) {
-      document.getElementById('msg').style.display = pts.length ? 'none' : 'block';
       var labels = weekLabels(pts);
       var peopleAxis = { beginAtZero:true, grace:'14%', position:'left',
         title:{display:true,text:'People',color:'#888'}, ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} };
       var xAxis = { ticks:{color:'#ddd',font:{size:12}}, grid:{color:'#1e1e1e'} };
 
-      if (chartReh) chartReh.destroy();
-      chartReh = new Chart(document.getElementById('chartReh'), {
+      var hasReh = pts.some(function(p){ return p.satPresent!=null || p.offering!=null; });
+      var hasSun = pts.some(function(p){ return p.sunPresent!=null; });
+      toggle('rehBox','rehEmpty',hasReh);
+      toggle('sunBox','sunEmpty',hasSun);
+
+      if (chartReh) { chartReh.destroy(); chartReh = null; }
+      if (hasReh) chartReh = new Chart(document.getElementById('chartReh'), {
         type:'bar', plugins:[GLGC.valueLabels],
         data:{ labels:labels, datasets:[
           { label:'Rehearsal attendance', data:pts.map(function(p){return p.satPresent;}),
@@ -303,8 +338,8 @@
             title:{display:true,text:'GHS',color:'#888'}, ticks:{color:'#e2574c'}, grid:{drawOnChartArea:false} } } }
       });
 
-      if (chartSun) chartSun.destroy();
-      chartSun = new Chart(document.getElementById('chartSun'), {
+      if (chartSun) { chartSun.destroy(); chartSun = null; }
+      if (hasSun) chartSun = new Chart(document.getElementById('chartSun'), {
         type:'bar', plugins:[GLGC.valueLabels],
         data:{ labels:labels, datasets:[
           { label:'Sunday attendance', data:pts.map(function(p){return p.sunPresent;}),
@@ -317,7 +352,7 @@
 
     // Individual shepherd: present/absent (1 / 0) bars per week.
     function renderShepherd(pts) {
-      document.getElementById('msg').style.display = pts.length ? 'none' : 'block';
+      toggle('rehBox','rehEmpty',true); toggle('sunBox','sunEmpty',true);
       var labels = weekLabels(pts);
       var binAxis = { min:0, max:1.15, position:'left', ticks:{ color:'#ddd', stepSize:1,
         callback:function(v){ return v === 1 ? 'Present' : v === 0 ? 'Absent' : ''; } },
