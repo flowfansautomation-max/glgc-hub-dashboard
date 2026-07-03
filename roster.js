@@ -92,7 +92,8 @@
       ['David Buckman', '0248417478'], ['Esther', '0533091510'], ['Abigail Quartey', '0546780169'] ] },
 
     { choir: 'Love Is Patient Choir', governor: 'Lois Nterful', shepherds: [
-      ['Lois', '0559682426'], ['Celine', '0240096784'], ['David', '0537753163'] ] },
+      ['Lois', '0559682426'], ['Celine', '0240096784'], ['David', '0537753163'],
+      ['Elizabeth Amuzu', null] ] },
 
     { choir: 'Unfeigned Love Singers', governor: 'Ninette Dodoo', shepherds: [
       ['Ninette', '0536153301'], ['Kofi', '0233678900'], ['Chara Anti', '0596049049'] ] },

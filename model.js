@@ -58,6 +58,7 @@ window.GLGC = (function () {
     'elizabeth akakpo':'Claudia Quayson',         // Kasoa
     'claudia apaloo':'Claudia Quayson',
     'celine ayitey':'Lois Nterful',
+    'elizabeth amuzu':'Lois Nterful',             // Kasoa Dumas school
     'lina yartey':'Michelle William-Addo',        // Taifa
     'lovelace dadzie':'Dorcas Longdon',           // Kolebu
     'ayikaikor ankrah':'—', 'sharon-rose nartey':'—'   // Jesus Night hub
@@ -74,6 +75,7 @@ window.GLGC = (function () {
     'elizabeth akakpo':['Claudia Quayson','Elizabeth'],
     'claudia apaloo':['Claudia Quayson','Claudia'],
     'celine ayitey':['Lois Nterful','Celine'],
+    'elizabeth amuzu':['Lois Nterful','Elizabeth Amuzu'],
     'lina yartey':['Michelle William-Addo','Lina'],
     'lovelace dadzie':['Dorcas Longdon','Lovelace Dadzie'],
     'ayikaikor ankrah':['—','Ayikaikor Ankrah'],
