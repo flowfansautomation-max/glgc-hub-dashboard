@@ -57,6 +57,7 @@ window.GLGC = (function () {
     'princess kanu':'Claudia Quayson',            // Ablaykuma
     'elizabeth akakpo':'Claudia Quayson',         // Kasoa
     'claudia apaloo':'Claudia Quayson',
+    'sarah ayitey':'Claudia Quayson',             // North Kaneshie
     'celine ayitey':'Lois Nterful',
     'elizabeth amuzu':'Lois Nterful',             // Kasoa Dumas school
     'lina yartey':'Michelle William-Addo',        // Taifa
@@ -74,6 +75,7 @@ window.GLGC = (function () {
     'princess kanu':['Claudia Quayson','Princess'],
     'elizabeth akakpo':['Claudia Quayson','Elizabeth'],
     'claudia apaloo':['Claudia Quayson','Claudia'],
+    'sarah ayitey':['Claudia Quayson','Sarah Ayitey'],
     'celine ayitey':['Lois Nterful','Celine'],
     'elizabeth amuzu':['Lois Nterful','Elizabeth Amuzu'],
     'lina yartey':['Michelle William-Addo','Lina'],

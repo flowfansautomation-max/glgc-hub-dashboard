@@ -35,7 +35,8 @@
     { choir: 'Love Never Fails Choir', governor: 'Claudia Quayson', shepherds: [
       ['Claudia', '0549776091'], ['Elizabeth', '0592490004'], ['Sarah', '0595231190'],
       ['Mabel', '0556298994'], ['Pascaline', '0555709524'], ['Princess', '0543207014'],
-      ['Jacqueline', '0537952246'], ['Beatrice', '0592747630'], ['Genevive', '0591548965'] ] },
+      ['Jacqueline', '0537952246'], ['Beatrice', '0592747630'], ['Genevive', '0591548965'],
+      ['Sarah Ayitey', null] ] },
 
     { choir: 'God So Loved Choir', governor: 'Stephanie Bediako', shepherds: [
       ['Stephanie', '0557313151'], ['Honesty', '0546382842'], ['Sylvester', '0545498544'],
