@@ -94,10 +94,11 @@
 
     { choir: 'Love Is Patient Choir', governor: 'Lois Nterful', shepherds: [
       ['Lois', '0559682426'], ['Celine', '0240096784'], ['David', '0537753163'],
-      ['Elizabeth Amuzu', null] ] },
+      ['Elizabeth Amuzu', null], ['Patience Oriella', null] ] },
 
     { choir: 'Unfeigned Love Singers', governor: 'Ninette Dodoo', shepherds: [
-      ['Ninette', '0536153301'], ['Kofi', '0233678900'], ['Chara Anti', '0596049049'] ] },
+      ['Ninette', '0536153301'], ['Kofi', '0233678900'], ['Chara Anti', '0596049049'],
+      ['Abigail Charis', null] ] },
 
     // Jesus Night Choir has no governor listed — the choir is its own hub.
     { choir: 'Jesus Night Choir', governor: '—', shepherds: [

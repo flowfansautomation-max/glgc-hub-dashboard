@@ -60,6 +60,8 @@ window.GLGC = (function () {
     'sarah ayitey':'Claudia Quayson',             // North Kaneshie
     'celine ayitey':'Lois Nterful',
     'elizabeth amuzu':'Lois Nterful',             // Kasoa Dumas school
+    'patience oriella':'Lois Nterful',            // Bubiashie
+    'abigail charis':'Ninette Dodoo',             // Gh Media
     'lina yartey':'Michelle William-Addo',        // Taifa
     'lovelace dadzie':'Dorcas Longdon',           // Kolebu
     'ayikaikor ankrah':'—', 'sharon-rose nartey':'—'   // Jesus Night hub
@@ -78,6 +80,8 @@ window.GLGC = (function () {
     'sarah ayitey':['Claudia Quayson','Sarah Ayitey'],
     'celine ayitey':['Lois Nterful','Celine'],
     'elizabeth amuzu':['Lois Nterful','Elizabeth Amuzu'],
+    'patience oriella':['Lois Nterful','Patience Oriella'],
+    'abigail charis':['Ninette Dodoo','Abigail Charis'],
     'lina yartey':['Michelle William-Addo','Lina'],
     'lovelace dadzie':['Dorcas Longdon','Lovelace Dadzie'],
     'ayikaikor ankrah':['—','Ayikaikor Ankrah'],
