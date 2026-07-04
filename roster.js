@@ -81,7 +81,7 @@
 
     // Betty Marcella (0596524798) removed — she belongs to Kiki's hub (same person).
     { choir: 'Steadfast Love Choir', governor: 'Joanita Djabatey', shepherds: [
-      ['Joanita', '0553833171'], ['Ewuradjoa Asirifi', null], ['Kingsley Boadu', '0551986770'],
+      ['Joanita Djabatey', '0553833171'], ['Ewuradjoa Asirifi', null], ['Kingsley Boadu', '0551986770'],
       ['Roland', '0554078115'], ['Papa Yaw', '0551130050'],
       ['Gloria Budu', '0541737442'], ['Portia Danquah', '0535552533'] ] },
 

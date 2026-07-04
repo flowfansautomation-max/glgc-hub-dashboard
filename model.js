@@ -88,7 +88,7 @@ window.GLGC = (function () {
     'sharon-rose nartey':['—','Sharon Rose Nartey'],
     'dorcas longdon':['Dorcas Longdon','Dorcas Longdon'],
     'hannah-joy adade':['Hannah-Joy Adade','Hannah Joy'],
-    'joanita djabatey':['Joanita Djabatey','Joanita'],
+    'joanita djabatey':['Joanita Djabatey','Joanita Djabatey'],
     'johanna nakoja':['Johanna Nakoja','Johanna Nakoja'],
     'kezia ogoe':['Keziah Ogoe','Keziah'],
     'lois nterful':['Lois Nterful','Lois'],
