@@ -43,7 +43,7 @@
       ['Stephen', '0504153331'] ] },
 
     { choir: 'Abundant Love Choir', governor: 'Helen Feneku', shepherds: [
-      ['Helen Fenuku', '0201974618'] ] },
+      ['Helen Feneku', '0201974618'] ] },
 
     { choir: 'Peace And Love Singers', governor: 'Emmanuel Owiredu', shepherds: [
       ['Emmanuel Owiredu', '0595228643'] ] },
