@@ -45,6 +45,12 @@
     { choir: 'Peace And Love Singers', governor: 'Emmanuel Owiredu', shepherds: [
       ['Emmanuel Owiredu', '0595228643'] ] },
 
+    { choir: 'Peace And Love Singers', governor: 'Rejoice Amartey', shepherds: [
+      ['Rejoice Amartey', '0543150768'] ] },
+
+    { choir: 'Peace And Love Singers', governor: 'Davidina Adagbe', shepherds: [
+      ['Davidina Adagbe', '0207142392'] ] },
+
     { choir: 'Perfect Love Choir', governor: 'David Aseda Orleans-Lindsay', shepherds: [
       ['David Aseda Orleans-Lindsay', '0593435949'] ] },
 
