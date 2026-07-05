@@ -29,6 +29,9 @@
     { choir: 'God So Loved Choir', governor: 'Stephanie Bediako', shepherds: [
       ['Stephanie Bediako', '0557313151'], ['Nathaniel Bamfo', '0592622632'] ] },
 
+    { choir: 'God So Loved Choir', governor: 'Dorcas Poku', shepherds: [
+      ['Dorcas Poku', '0208600307'] ] },
+
     { choir: 'Everlasting Love Choir', governor: 'Hannah-Joy Adade', shepherds: [
       ['Hannah Joy Adade', '0574061899'] ] },
 
