@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GLGC Hub Dashboard — Weekly Summary</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="roster.js"></script>
-  <script src="model.js"></script>
+  <script src="roster.js?v=19"></script>
+  <script src="model.js?v=19"></script>
   <style>
     :root { --blue:#1f5fff; --gold:#e6c878; --red:#e2574c; --sun:#f5c518; }
     * { box-sizing:border-box; }
@@ -96,7 +96,7 @@
       if (!MODEL) return;
       var wi = +document.getElementById('week').value;
       var w = MODEL.weeks[wi];
-      var subs = MODEL.satWeekly[wi] || [];
+      var subs = (MODEL.satWeekly && MODEL.satWeekly[wi]) || [];
 
       var totAtt = subs.reduce(function (a, s) { return a + s.att; }, 0);
       var totOff = subs.reduce(function (a, s) { return a + s.off; }, 0);
