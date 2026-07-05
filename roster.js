@@ -43,7 +43,8 @@
       ['Stephen', '0504153331'] ] },
 
     { choir: 'Abundant Love Choir', governor: 'Helen Feneku', shepherds: [
-      ['Helen Feneku', '0201974618'] ] },
+      ['Helen Feneku', '0201974618'], ['Bernice', '0532654322'],
+      ['Morgan Mensah', null] ] },
 
     { choir: 'Peace And Love Singers', governor: 'Emmanuel Owiredu', shepherds: [
       ['Emmanuel Owiredu', '0595228643'] ] },
@@ -65,7 +66,7 @@
 
     { choir: 'True Love Choir', governor: 'Dorcas Longdon', shepherds: [
       ['Dorcas Longdon', '0266459254'], ['David Buckman', '0248417478'],
-      ['Lovelace Dadzie', '0204959173'] ] },
+      ['Lovelace Dadzie', '0204959173'], ['Edwin Takyi', '0240084722'] ] },
 
     { choir: 'Love Is Patient Choir', governor: 'Lois Nterful', shepherds: [
       ['Lois Nterful', '0559682426'], ['Celine Ayitey', '0240096784'],

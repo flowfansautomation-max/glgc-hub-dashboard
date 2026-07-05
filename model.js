@@ -64,6 +64,9 @@ window.GLGC = (function () {
     'abigail charis':'Ninette Dodoo',             // Gh Media
     'lina yartey':'Michelle William-Addo',        // Taifa
     'lovelace dadzie':'Dorcas Longdon',           // Kolebu
+    'edwin takyi':'Dorcas Longdon',               // Mataheko
+    'bernice':'Helen Feneku',                     // Madina
+    'morgan mensah':'Helen Feneku',               // Mempasem
     'ayikaikor ankrah':'—', 'sharon-rose nartey':'—'   // Jesus Night hub
   };
 
@@ -83,6 +86,9 @@ window.GLGC = (function () {
     'abigail charis':['Ninette Dodoo','Abigail Charis Adom-Barnor'],
     'lina yartey':['Michelle William-Addo','Lina Yartey'],
     'lovelace dadzie':['Dorcas Longdon','Lovelace Dadzie'],
+    'edwin takyi':['Dorcas Longdon','Edwin Takyi'],
+    'bernice':['Helen Feneku','Bernice'],
+    'morgan mensah':['Helen Feneku','Morgan Mensah'],
     'ayikaikor ankrah':['—','Ayikaikor Ankrah'],
     'sharon-rose nartey':['—','Sharon Rose Nartey'],
     'dorcas longdon':['Dorcas Longdon','Dorcas Longdon'],
