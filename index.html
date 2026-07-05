@@ -259,24 +259,10 @@
         GLGC.setAvatar(document.getElementById('avatar'), document.getElementById('initials'), key, name);
       }
 
-      // Show a clear note instead of empty axes when there's no real data.
-      var charts = document.getElementById('charts');
-      var awaiting = document.getElementById('awaiting');
-      var hasData = (sel.level === 'ministry') ? true : !!e.hasData;
-      if (!hasData) {
-        charts.style.display = 'none';
-        shepStats.style.display = 'none';
-        awaiting.style.display = 'block';
-        awaiting.innerHTML = (sel.level === 'shepherd')
-          ? 'No individual data for this shepherd yet — they haven’t led a rehearsal.<br>Per-shepherd <b>Sunday attendance</b> starts once your new form is collecting it.'
-          : 'No attendance has been recorded for this hub in the sheets yet.';
-        return;
-      }
-      awaiting.style.display = 'none';
-      charts.style.display = 'block';
-
-      // Hubs and individual shepherds render the same way now — shepherds show
-      // their own rehearsal turnout + offering (Sunday per-shepherd isn't tracked yet).
+      // Every page shows both sections — rehearsal (chart or "no data" note) and
+      // Sunday (empty until the per-person Sunday form feeds it).
+      document.getElementById('awaiting').style.display = 'none';
+      document.getElementById('charts').style.display = 'block';
       shepStats.style.display = 'none';
       legOff.style.display = '';
       document.getElementById('legRehTxt').textContent = 'Rehearsal attendance';

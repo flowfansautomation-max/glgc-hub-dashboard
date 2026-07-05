@@ -71,30 +71,29 @@ window.GLGC = (function () {
   // so each shepherd's own rehearsal turnout + offering shows on their page.
   // [governor, shepherd name]  (governor-led rows land on the governor's own entry)
   var SAT_TO_SHEP = {
-    'grace fianu':['Christiana Dzekoe','Grace'],
     'janet thomas':['Kiki Heward-Mills','Janet Thomas'],
-    'pascaline obaze':['Claudia Quayson','Pascaline'],
-    'princess kanu':['Claudia Quayson','Princess'],
-    'elizabeth akakpo':['Claudia Quayson','Elizabeth'],
-    'claudia apaloo':['Claudia Quayson','Claudia'],
+    'christiana dzekoe':['Christiana Dzekoe','Christiana Dzekoe'],
+    'pascaline obaze':['Claudia Quayson','Pascaline Obadze'],
+    'princess kanu':['Claudia Quayson','Princess Kanu'],
+    'elizabeth akakpo':['Claudia Quayson','Elizabeth Akakpo'],
+    'claudia apaloo':['Claudia Quayson','Claudia Apaloo'],
     'sarah ayitey':['Claudia Quayson','Sarah Ayitey'],
-    'celine ayitey':['Lois Nterful','Celine'],
-    'elizabeth amuzu':['Lois Nterful','Elizabeth Amuzu'],
-    'patience oriella':['Lois Nterful','Patience Oriella'],
-    'abigail charis':['Ninette Dodoo','Abigail Charis'],
-    'lina yartey':['Michelle William-Addo','Lina'],
+    'celine ayitey':['Lois Nterful','Celine Ayitey'],
+    'patience oriella':['Lois Nterful','Patience Oriella Nortey'],
+    'abigail charis':['Ninette Dodoo','Abigail Charis Adom-Barnor'],
+    'lina yartey':['Michelle William-Addo','Lina Yartey'],
     'lovelace dadzie':['Dorcas Longdon','Lovelace Dadzie'],
     'ayikaikor ankrah':['—','Ayikaikor Ankrah'],
     'sharon-rose nartey':['—','Sharon Rose Nartey'],
     'dorcas longdon':['Dorcas Longdon','Dorcas Longdon'],
-    'hannah-joy adade':['Hannah-Joy Adade','Hannah Joy'],
+    'hannah-joy adade':['Hannah-Joy Adade','Hannah Joy Adade'],
     'joanita djabatey':['Joanita Djabatey','Joanita Djabatey'],
     'johanna nakoja':['Johanna Nakoja','Johanna Nakoja'],
-    'kezia ogoe':['Keziah Ogoe','Keziah'],
-    'lois nterful':['Lois Nterful','Lois'],
-    'michelle william-addo':['Michelle William-Addo','Michelle'],
-    'stephanie bediako':['Stephanie Bediako','Stephanie'],
-    'david aseda':['David Aseda Orleans-Lindsay','Aseda']
+    'kezia ogoe':['Keziah Ogoe','Keziah Ogoe'],
+    'lois nterful':['Lois Nterful','Lois Nterful'],
+    'michelle william-addo':['Michelle William-Addo','Michelle William-Addo'],
+    'stephanie bediako':['Stephanie Bediako','Stephanie Bediako'],
+    'david aseda':['David Aseda Orleans-Lindsay','David Aseda Orleans-Lindsay']
   };
 
   function norm(s){ return String(s == null ? '' : s).toLowerCase().replace(/\s+/g,' ').trim(); }
