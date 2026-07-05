@@ -11,24 +11,27 @@
     :root { --blue:#1f5fff; --gold:#e6c878; --red:#e2574c; --sun:#f5c518; }
     * { box-sizing:border-box; }
     html, body { margin:0; background:#000; color:#fff; font-family:Arial, Helvetica, sans-serif; }
-    .wrap { max-width:1100px; margin:0 auto; padding:14px 22px 60px; }
+    .wrap { max-width:1180px; margin:0 auto; padding:14px 22px 60px; }
     .nav { display:flex; gap:10px; justify-content:center; margin-bottom:10px; flex-wrap:wrap; }
     .nav a { color:#bbb; text-decoration:none; border:1px solid #333; border-radius:20px; padding:7px 16px; font-size:14px; }
     .nav a.active { background:var(--gold); color:#000; border-color:var(--gold); font-weight:bold; }
     .title { text-align:center; font-family:Georgia,serif; color:var(--gold); font-size:30px; margin:6px 0 4px; }
-    .sub { text-align:center; color:#8a8a8a; font-size:13px; margin-bottom:14px; }
-    .cards { display:flex; gap:14px; justify-content:center; margin:14px 0 4px; flex-wrap:wrap; }
-    .card { background:#0e0e0e; border:1px solid #262626; border-radius:12px; padding:16px 24px; text-align:center; min-width:150px; }
-    .card .n { font-size:30px; font-weight:bold; }
-    .card .l { font-size:13px; color:#999; margin-top:4px; }
-    .section { margin-top:26px; }
+    .summary { text-align:center; color:#cfcfcf; font-size:15px; margin-bottom:12px; }
+    .summary b { color:#fff; }
+    .picker { display:flex; gap:10px; justify-content:center; align-items:center; margin-bottom:6px; }
+    .picker .lbl { color:#999; font-size:13px; }
+    select { background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:9px 12px; font-size:15px; }
+    .section { margin-top:24px; }
     .section-label { display:inline-block; background:#161616; border:1px solid #333;
       border-left:4px solid var(--gold); border-radius:8px; padding:8px 18px;
       font-size:17px; font-weight:bold; letter-spacing:.5px; }
     .legend { display:flex; gap:26px; margin:14px 2px 4px; color:#cfcfcf; font-size:15px; flex-wrap:wrap; }
     .legend span { display:inline-flex; align-items:center; gap:9px; }
     .sw { width:24px; height:13px; border-radius:2px; display:inline-block; }
-    .chartbox { height:340px; margin-top:6px; }
+    .chartscroll { overflow-x:auto; }
+    .chartinner { height:430px; min-width:100%; }
+    .empty { color:#777; font-size:15px; text-align:center; padding:60px 20px;
+      border:1px dashed #2a2a2a; border-radius:12px; margin-top:6px; }
   </style>
 </head>
 <body>
@@ -38,72 +41,118 @@
       <a href="all.html">All Hubs</a>
       <a href="summary.html" class="active">Weekly Summary</a>
     </div>
-    <div class="title">WHOLE MINISTRY — WEEKLY</div>
-    <div class="sub">Every hub combined, one bar per week</div>
-
-    <div class="cards" id="cards"></div>
+    <div class="title">WEEKLY SUMMARY</div>
+    <div class="summary" id="summary"></div>
+    <div class="picker">
+      <span class="lbl">Week:</span>
+      <select id="week" onchange="render()"></select>
+    </div>
 
     <div class="section">
-      <div class="section-label">🎼 Rehearsal Attendance</div>
+      <div class="section-label">🎼 Rehearsal Attendance — by hub</div>
       <div class="legend">
         <span><i class="sw" style="background:var(--blue)"></i> Rehearsal attendance</span>
         <span><i class="sw" style="background:var(--red)"></i> Offering (GHS)</span>
       </div>
-      <div class="chartbox"><canvas id="chartReh"></canvas></div>
+      <div class="chartscroll"><div class="chartinner" id="rehInner"><canvas id="chartReh"></canvas></div></div>
+      <div class="empty" id="rehEmpty" style="display:none">No rehearsals reported for this week yet.</div>
     </div>
 
     <div class="section">
-      <div class="section-label">⛪ Sunday Attendance</div>
+      <div class="section-label">⛪ Sunday Attendance — by hub</div>
       <div class="legend">
         <span><i class="sw" style="background:var(--sun)"></i> Sunday attendance</span>
       </div>
-      <div class="chartbox"><canvas id="chartSun"></canvas></div>
+      <div class="chartscroll"><div class="chartinner" id="sunInner"><canvas id="chartSun"></canvas></div></div>
+      <div class="empty" id="sunEmpty" style="display:none">No Sunday attendance recorded for this week yet.</div>
     </div>
   </div>
 
   <script>
-    GLGC.load(function (MODEL) {
-      var w = MODEL.weekly;
-      // most recent week that actually has a value for the given field
-      function latest(field) { for (var i = w.length - 1; i >= 0; i--) { if (w[i][field]) return w[i][field]; } return 0; }
-      var totalOff = w.reduce(function (a, p) { return a + (p.offering || 0); }, 0);
-      document.getElementById('cards').innerHTML =
-        '<div class="card"><div class="n">' + MODEL.shepherds.length + '</div><div class="l">People on roll</div></div>' +
-        '<div class="card"><div class="n" style="color:var(--blue)">' + latest('satPresent') + '</div><div class="l">Latest rehearsal</div></div>' +
-        '<div class="card"><div class="n" style="color:var(--sun)">' + latest('sunPresent') + '</div><div class="l">Latest Sunday</div></div>' +
-        '<div class="card"><div class="n" style="color:var(--gold)">GHS ' + totalOff.toLocaleString() + '</div><div class="l">Total offering</div></div>';
+    var MODEL = null, chartReh = null, chartSun = null;
 
-      var labels = w.map(function (p) { return ['WK ' + p.week, p.label.split('· ')[1] || '']; });
-      var xAxis = { ticks:{color:'#ddd',font:{size:12}}, grid:{color:'#1e1e1e'} };
-      var peopleAxis = { beginAtZero:true, grace:'12%', position:'left',
-        title:{display:true,text:'People',color:'#888'}, ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} };
-
-      // Rehearsal attendance + offering
-      new Chart(document.getElementById('chartReh'), {
-        type: 'bar', plugins: [GLGC.valueLabels],
-        data: { labels: labels, datasets: [
-          { label:'Rehearsal attendance', data:w.map(function(p){return p.satPresent;}),
-            backgroundColor:'#1f5fff', borderRadius:3, maxBarThickness:30, yAxisID:'y' },
-          { label:'Offering (GHS)', data:w.map(function(p){return p.offering;}),
-            backgroundColor:'#e2574c', borderRadius:3, maxBarThickness:30, yAxisID:'y1' }
-        ]},
-        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
-          scales:{ x:xAxis, y:peopleAxis,
-            y1:{ beginAtZero:true, grace:'12%', position:'right', title:{display:true,text:'GHS',color:'#888'},
-                 ticks:{color:'#e2574c'}, grid:{drawOnChartArea:false} } } }
+    GLGC.load(function (m) {
+      MODEL = m;
+      var wk = document.getElementById('week');
+      MODEL.weeks.forEach(function (w, i) {
+        var o = document.createElement('option'); o.value = i; o.textContent = w.label;
+        wk.appendChild(o);
       });
-
-      // Sunday attendance
-      new Chart(document.getElementById('chartSun'), {
-        type: 'bar', plugins: [GLGC.valueLabels],
-        data: { labels: labels, datasets: [
-          { label:'Sunday attendance', data:w.map(function(p){return p.sunPresent;}),
-            backgroundColor:'#f5c518', borderRadius:3, maxBarThickness:30, yAxisID:'y' }
-        ]},
-        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
-          scales:{ x:xAxis, y:peopleAxis } }
-      });
+      // default to the latest week that has any rehearsal reports, else the last week
+      var def = MODEL.weeks.length - 1;
+      for (var i = MODEL.weeks.length - 1; i >= 0; i--) {
+        if (MODEL.satWeekly[i] && MODEL.satWeekly[i].length) { def = i; break; }
+      }
+      wk.value = def;
+      render();
     }, function (e) { console.error(e); });
+
+    function toggle(innerId, emptyId, has) {
+      document.getElementById(innerId).parentNode.style.display = has ? '' : 'none';
+      document.getElementById(emptyId).style.display = has ? 'none' : 'block';
+    }
+
+    function render() {
+      if (!MODEL) return;
+      var wi = +document.getElementById('week').value;
+      var w = MODEL.weeks[wi];
+      var subs = MODEL.satWeekly[wi] || [];
+
+      var totAtt = subs.reduce(function (a, s) { return a + s.att; }, 0);
+      var totOff = subs.reduce(function (a, s) { return a + s.off; }, 0);
+      document.getElementById('summary').innerHTML =
+        w.label + '  ·  <b>' + subs.length + '</b> hubs reported  ·  <b>' + totAtt +
+        '</b> attendance  ·  <b>GHS ' + totOff.toLocaleString() + '</b> offering';
+
+      // ---- Rehearsal: one grouped bar (attendance + offering) per reporting hub ----
+      var hasReh = subs.length > 0;
+      toggle('rehInner', 'rehEmpty', hasReh);
+      if (hasReh) {
+        document.getElementById('rehInner').style.minWidth = Math.max(700, subs.length * 58) + 'px';
+        var rLabels = subs.map(function (s) { return [s.name, s.location || '']; });
+        if (chartReh) chartReh.destroy();
+        chartReh = new Chart(document.getElementById('chartReh'), {
+          type: 'bar', plugins: [GLGC.valueLabels],
+          data: { labels: rLabels, datasets: [
+            { label:'Rehearsal attendance', data:subs.map(function(s){return s.att;}),
+              backgroundColor:'#1f5fff', borderRadius:3, maxBarThickness:26, yAxisID:'y' },
+            { label:'Offering (GHS)', data:subs.map(function(s){return s.off;}),
+              backgroundColor:'#e2574c', borderRadius:3, maxBarThickness:26, yAxisID:'y1' }
+          ]},
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+            scales:{
+              x:{ ticks:{color:'#ddd',font:{size:11}}, grid:{color:'#1e1e1e'} },
+              y:{ beginAtZero:true, grace:'14%', position:'left', title:{display:true,text:'People',color:'#888'},
+                  ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} },
+              y1:{ beginAtZero:true, grace:'14%', position:'right', title:{display:true,text:'GHS',color:'#888'},
+                   ticks:{color:'#e2574c'}, grid:{drawOnChartArea:false} } } }
+        });
+      } else if (chartReh) { chartReh.destroy(); chartReh = null; }
+
+      // ---- Sunday: attendance per hub (governor) for this week ----
+      var sun = MODEL.governors.map(function (g) {
+        return { name: g.governor, v: g.points[wi].sunPresent };
+      }).filter(function (r) { return r.v != null; })
+        .sort(function (a, b) { return b.v - a.v; });
+      var hasSun = sun.length > 0;
+      toggle('sunInner', 'sunEmpty', hasSun);
+      if (hasSun) {
+        document.getElementById('sunInner').style.minWidth = Math.max(700, sun.length * 58) + 'px';
+        if (chartSun) chartSun.destroy();
+        chartSun = new Chart(document.getElementById('chartSun'), {
+          type: 'bar', plugins: [GLGC.valueLabels],
+          data: { labels: sun.map(function(r){return r.name;}), datasets: [
+            { label:'Sunday attendance', data:sun.map(function(r){return r.v;}),
+              backgroundColor:'#f5c518', borderRadius:3, maxBarThickness:30, yAxisID:'y' }
+          ]},
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+            scales:{
+              x:{ ticks:{color:'#ddd',font:{size:11}}, grid:{color:'#1e1e1e'} },
+              y:{ beginAtZero:true, grace:'12%', title:{display:true,text:'People',color:'#888'},
+                  ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} } } }
+        });
+      } else if (chartSun) { chartSun.destroy(); chartSun = null; }
+    }
   </script>
 </body>
 </html>

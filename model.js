@@ -177,13 +177,15 @@ window.GLGC = (function () {
     var cols=resp.table.cols.map(function(c){ return norm(c.label); });
     function find(){ for(var i=0;i<arguments.length;i++){ var k=cols.indexOf(arguments[i]); if(k>=0) return k; } return -1; }
     var iDate=find('date'), iLeader=find('name of leader who had the service'),
-        iAtt=find('attendance'), iOff=find('offering');
+        iAtt=find('attendance'), iOff=find('offering'), iHub=find('hub location');
     var rows=[];
     (resp.table.rows||[]).forEach(function(r){
       var c=r.c||[];
-      var leader=norm(c[iLeader]&&c[iLeader].v); if(!leader) return;
+      var leaderRaw=String((c[iLeader]&&c[iLeader].v)||'').trim();
+      var leader=norm(leaderRaw); if(!leader) return;
       var d=parseGvizDate(c[iDate]&&c[iDate].v); if(!d) return;
-      rows.push({ leader:leader, date:d,
+      rows.push({ leader:leader, leaderRaw:leaderRaw,
+        location:String((c[iHub]&&c[iHub].v)||'').trim(), date:d,
         att:+(c[iAtt]&&c[iAtt].v)||0, off:+(c[iOff]&&c[iOff].v)||0 });
     });
     return rows;
@@ -228,14 +230,25 @@ window.GLGC = (function () {
       return o;
     });
 
-    // aggregate each rehearsal row onto its hub (governor) AND the leader (shepherd)
+    // aggregate each rehearsal row onto its hub (governor) AND the leader (shepherd),
+    // and keep the raw per-week submissions (every reporting hub, incl. any not on
+    // the roster) for the week-by-week breakdown.
     var satByGov={};
+    var satWeekly=weeks.map(function(){ return {}; });   // weekIdx -> {leader|loc -> {name,location,att,off}}
     sat.forEach(function(row){
       var i=weekIndexFor(row.date); if(i<0) return;
       var gov=SAT_TO_GOV[row.leader];
       if(gov){ var g=satByGov[gov]||(satByGov[gov]={}); var cg=g[i]||(g[i]={att:0,off:0}); cg.att+=row.att; cg.off+=row.off; }
       var sk=SAT_TO_SHEP[row.leader];
       if(sk){ var so=shepByKey[sk[0]+'|'+sk[1]]; if(so){ var cs=so._sat[i]||(so._sat[i]={att:0,off:0}); cs.att+=row.att; cs.off+=row.off; } }
+      var key=row.leader+'|'+row.location.toLowerCase();
+      var cell=satWeekly[i][key]||(satWeekly[i][key]={name:row.leaderRaw, location:row.location, att:0, off:0});
+      cell.att+=row.att; cell.off+=row.off;
+    });
+    // flatten to sorted arrays per week
+    satWeekly=satWeekly.map(function(b){
+      return Object.keys(b).map(function(k){ return b[k]; })
+        .sort(function(a,b){ return a.name.localeCompare(b.name); });
     });
 
     // shepherd points — their own rehearsal turnout + offering (Sunday per-shepherd not tracked yet)
@@ -311,7 +324,7 @@ window.GLGC = (function () {
     });
 
     return { weeks:weeks, shepherds:shepherds, byId:byId,
-             governors:governors, choirs:choirs, weekly:weekly };
+             governors:governors, choirs:choirs, weekly:weekly, satWeekly:satWeekly };
   }
 
   // ---- shared chart helpers -------------------------------------------------
