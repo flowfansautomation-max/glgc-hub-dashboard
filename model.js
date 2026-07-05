@@ -191,17 +191,32 @@ window.GLGC = (function () {
 
   // ---- build MODEL onto the roster ------------------------------------------
   function build(sun, sat){
-    // canonical weeks = the Sunday columns; rehearsal Saturday = day before
-    var weeks=sun.weekCols.map(function(w){
-      var sunD=w.date, satD=new Date(sunD.getTime()-86400000);
-      return { week:isoWeek(sunD), sunDate:sunD, satDate:satD,
-               sunLabel:fmt(sunD), satLabel:fmt(satD), label:'WK '+isoWeek(sunD)+' · '+fmt(sunD) };
-    });
-    // week index for a rehearsal date (nearest Sunday within 4 days)
+    // The service Sunday for any rehearsal date = the Sunday on/after it.
+    function nextSunday(d){
+      var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+      x.setDate(x.getDate()+((7-x.getDay())%7));
+      return x;
+    }
+    // Weeks = the Sunday columns PLUS any newer week that already has rehearsal
+    // data, so "this week" appears even before its Sunday column exists.
+    var weekMap={};
+    sun.weekCols.forEach(function(w){ weekMap[w.date.getTime()]=w.date; });
+    sat.forEach(function(row){ var s=nextSunday(row.date); weekMap[s.getTime()]=s; });
+    var weeks=Object.keys(weekMap).map(function(k){ return weekMap[k]; })
+      .sort(function(a,b){ return a-b; })
+      .map(function(sunD){
+        var satD=new Date(sunD.getTime()-86400000);
+        return { week:isoWeek(sunD), sunDate:sunD, satDate:satD,
+                 sunLabel:fmt(sunD), satLabel:fmt(satD), label:'WK '+isoWeek(sunD)+' · '+fmt(sunD) };
+      });
+    // Sunday values are keyed by date (the columns don't cover the newest weeks).
+    var sunIdxByTime={};
+    sun.weekCols.forEach(function(w,i){ sunIdxByTime[w.date.getTime()]=i; });
+    // exact week index for a rehearsal date
     function weekIndexFor(date){
-      var best=-1, bestGap=5;
-      weeks.forEach(function(w,i){ var gap=Math.abs(w.sunDate-date)/86400000; if(gap<bestGap){ bestGap=gap; best=i; } });
-      return best;
+      var s=nextSunday(date).getTime();
+      for(var i=0;i<weeks.length;i++){ if(weeks[i].sunDate.getTime()===s) return i; }
+      return -1;
     }
 
     // shepherds skeleton + a (governor|name -> shepherd) lookup for attribution
@@ -246,7 +261,8 @@ window.GLGC = (function () {
       var sunVals=sun.byGov[hub.governor]||null;
       var satVals=satByGov[hub.governor]||null;
       var points=weeks.map(function(w,i){
-        var sp=sunVals?sunVals[i]:null;
+        var si=sunIdxByTime[w.sunDate.getTime()];
+        var sp=(sunVals && si!=null)?sunVals[si]:null;
         var sat=satVals&&satVals[i]?satVals[i]:null;
         return { week:w.week, label:w.label,
           sunPresent:(sp==null?null:sp),
