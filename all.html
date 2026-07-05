@@ -8,19 +8,28 @@
   <script src="roster.js?v=20"></script>
   <script src="model.js?v=20"></script>
   <style>
-    :root { --blue:#1f5fff; --gold:#e6c878; --green:#38b26a; }
+    :root { --blue:#1f5fff; --gold:#e6c878; --red:#e2574c; --sun:#f5c518; }
     * { box-sizing:border-box; }
     html, body { margin:0; background:#000; color:#fff; font-family:Arial, Helvetica, sans-serif; }
-    .wrap { max-width:1100px; margin:0 auto; padding:14px 22px 50px; }
+    .wrap { max-width:1180px; margin:0 auto; padding:14px 22px 60px; }
     .nav { display:flex; gap:10px; justify-content:center; margin-bottom:10px; flex-wrap:wrap; }
     .nav a { color:#bbb; text-decoration:none; border:1px solid #333; border-radius:20px; padding:7px 16px; font-size:14px; }
     .nav a.active { background:var(--gold); color:#000; border-color:var(--gold); font-weight:bold; }
     .title { text-align:center; font-family:Georgia,serif; color:var(--gold); font-size:30px; margin:6px 0 4px; }
-    .sub { text-align:center; color:#8a8a8a; font-size:13px; margin-bottom:14px; }
-    .topbar { display:flex; gap:12px; justify-content:center; margin-bottom:8px; flex-wrap:wrap; }
+    .sub { text-align:center; color:#8a8a8a; font-size:13px; margin-bottom:12px; }
+    .picker { display:flex; gap:10px; justify-content:center; align-items:center; margin-bottom:6px; flex-wrap:wrap; }
     select { background:#111; color:#fff; border:1px solid #333; border-radius:8px; padding:9px 12px; font-size:15px; }
-    .chartbox { height:560px; margin-top:14px; }
-    .msg { text-align:center; color:#888; padding:40px; }
+    .section { margin-top:24px; }
+    .section-label { display:inline-block; background:#161616; border:1px solid #333;
+      border-left:4px solid var(--gold); border-radius:8px; padding:8px 18px;
+      font-size:17px; font-weight:bold; letter-spacing:.5px; }
+    .legend { display:flex; gap:26px; margin:14px 2px 4px; color:#cfcfcf; font-size:15px; flex-wrap:wrap; }
+    .legend span { display:inline-flex; align-items:center; gap:9px; }
+    .sw { width:24px; height:13px; border-radius:2px; display:inline-block; }
+    .chartscroll { overflow-x:auto; }
+    .chartinner { height:430px; min-width:100%; }
+    .empty { color:#777; font-size:15px; text-align:center; padding:60px 20px;
+      border:1px dashed #2a2a2a; border-radius:12px; margin-top:6px; }
   </style>
 </head>
 <body>
@@ -31,25 +40,38 @@
       <a href="summary.html">Weekly Summary</a>
     </div>
     <div class="title">ALL HUBS COMPARED</div>
-    <div class="sub">Every hub side by side for one week — sorted highest to lowest</div>
-    <div class="topbar">
+    <div class="sub">Every hub side by side for one week</div>
+    <div class="picker">
       <select id="week" onchange="render()"></select>
       <select id="view" onchange="render()">
         <option value="gov">By governor (hub)</option>
         <option value="choir">By choir</option>
       </select>
-      <select id="metric" onchange="render()">
-        <option value="satPresent">Saturday attendance</option>
-        <option value="sunPresent">Sunday attendance</option>
-        <option value="offering">Offering (GHS)</option>
-      </select>
     </div>
-    <div class="chartbox"><canvas id="chart"></canvas></div>
-    <div class="msg" id="msg" style="display:none">No data.</div>
+
+    <div class="section">
+      <div class="section-label">🎼 Rehearsal Attendance</div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--blue)"></i> Rehearsal attendance</span>
+        <span><i class="sw" style="background:var(--red)"></i> Offering (GHS)</span>
+      </div>
+      <div class="chartscroll"><div class="chartinner" id="rehInner"><canvas id="chartReh"></canvas></div></div>
+      <div class="empty" id="rehEmpty" style="display:none">No rehearsals reported for this week yet.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">⛪ Sunday Attendance</div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--sun)"></i> Sunday attendance</span>
+      </div>
+      <div class="chartscroll"><div class="chartinner" id="sunInner"><canvas id="chartSun"></canvas></div></div>
+      <div class="empty" id="sunEmpty" style="display:none">No Sunday attendance recorded for this week yet.</div>
+    </div>
   </div>
 
   <script>
-    var MODEL = null, chart = null;
+    var MODEL = null, chartReh = null, chartSun = null;
+
     GLGC.load(function (m) {
       MODEL = m;
       var wk = document.getElementById('week');
@@ -61,43 +83,69 @@
       render();
     }, function (e) { console.error(e); });
 
-    function colorFor(metric) {
-      return metric === 'sunPresent' ? '#38b26a' : metric === 'offering' ? '#e6c878' : '#1f5fff';
+    function toggle(innerId, emptyId, has) {
+      document.getElementById(innerId).parentNode.style.display = has ? '' : 'none';
+      document.getElementById(emptyId).style.display = has ? 'none' : 'block';
     }
+    function shortChoir(c) { return c.replace(/ Choir| Singers/, ''); }
 
     function render() {
       if (!MODEL) return;
       var wi = +document.getElementById('week').value;
       var view = document.getElementById('view').value;
-      var metric = document.getElementById('metric').value;
       var groups = view === 'choir' ? MODEL.choirs : MODEL.governors;
+      function labelOf(g) {
+        return view === 'choir' ? g.choir : [g.governor, shortChoir(g.choir)];
+      }
+      var xAxis = { ticks:{color:'#ddd',font:{size:11}}, grid:{color:'#1e1e1e'} };
+      var peopleAxis = { beginAtZero:true, grace:'14%', position:'left',
+        title:{display:true,text:'People',color:'#888'}, ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} };
 
-      var rows = groups.map(function (g) {
-        var label = view === 'choir' ? g.choir : g.governor + '  (' + g.choir.replace(/ Choir| Singers/,'') + ')';
-        return { label: label, v: g.points[wi][metric] };
+      // ---- Rehearsal attendance + offering (one graph) ----
+      var reh = groups.map(function (g) {
+        return { label: labelOf(g), att: g.points[wi].satPresent, off: g.points[wi].offering };
+      }).filter(function (r) { return r.att != null || r.off != null; })
+        .sort(function (a, b) { return (b.att || 0) - (a.att || 0); });
+      var hasReh = reh.length > 0;
+      toggle('rehInner', 'rehEmpty', hasReh);
+      if (hasReh) {
+        document.getElementById('rehInner').style.minWidth = Math.max(700, reh.length * 62) + 'px';
+        if (chartReh) chartReh.destroy();
+        chartReh = new Chart(document.getElementById('chartReh'), {
+          type: 'bar', plugins: [GLGC.valueLabels],
+          data: { labels: reh.map(function(r){return r.label;}), datasets: [
+            { label:'Rehearsal attendance', data:reh.map(function(r){return r.att;}),
+              backgroundColor:'#1f5fff', borderRadius:3, maxBarThickness:30, yAxisID:'y' },
+            { label:'Offering (GHS)', data:reh.map(function(r){return r.off;}),
+              backgroundColor:'#e2574c', borderRadius:3, maxBarThickness:30, yAxisID:'y1' }
+          ]},
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+            scales:{ x:xAxis, y:peopleAxis,
+              y1:{ beginAtZero:true, grace:'14%', position:'right', title:{display:true,text:'GHS',color:'#888'},
+                   ticks:{color:'#e2574c'}, grid:{drawOnChartArea:false} } } }
+        });
+      } else if (chartReh) { chartReh.destroy(); chartReh = null; }
+
+      // ---- Sunday attendance ----
+      var sun = groups.map(function (g) {
+        return { label: labelOf(g), v: g.points[wi].sunPresent };
       }).filter(function (r) { return r.v != null; })
         .sort(function (a, b) { return b.v - a.v; });
-
-      document.getElementById('msg').style.display = rows.length ? 'none' : 'block';
-      document.getElementById('chart').parentNode.style.height = Math.max(360, rows.length * 30 + 80) + 'px';
-
-      var cfg = {
-        type: 'bar',
-        plugins: [GLGC.valueLabelsH],
-        data: { labels: rows.map(function(r){return r.label;}),
-          datasets: [{ label: metric, data: rows.map(function(r){return r.v;}),
-            backgroundColor: colorFor(metric), borderRadius:3, maxBarThickness:26 }] },
-        options: {
-          indexAxis: 'y', responsive:true, maintainAspectRatio:false,
-          plugins:{ legend:{display:false} },
-          scales:{
-            x:{ beginAtZero:true, grace:'8%', ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} },
-            y:{ ticks:{color:'#ddd',font:{size:12}}, grid:{color:'#141414'} }
-          }
-        }
-      };
-      if (chart) chart.destroy();
-      chart = new Chart(document.getElementById('chart'), cfg);
+      var hasSun = sun.length > 0;
+      toggle('sunInner', 'sunEmpty', hasSun);
+      if (hasSun) {
+        document.getElementById('sunInner').style.minWidth = Math.max(700, sun.length * 62) + 'px';
+        if (chartSun) chartSun.destroy();
+        chartSun = new Chart(document.getElementById('chartSun'), {
+          type: 'bar', plugins: [GLGC.valueLabels],
+          data: { labels: sun.map(function(r){return r.label;}), datasets: [
+            { label:'Sunday attendance', data:sun.map(function(r){return r.v;}),
+              backgroundColor:'#f5c518', borderRadius:3, maxBarThickness:30, yAxisID:'y' }
+          ]},
+          options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+            scales:{ x:xAxis, y:peopleAxis } }
+        });
+      } else if (chartSun) { chartSun.destroy(); chartSun = null; }
     }
   </script>
 </body>
