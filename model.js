@@ -41,67 +41,19 @@ window.GLGC = (function () {
     'emmanuel owiredu':'Emmanuel Owiredu'
   };
 
-  // Saturday rehearsal LEADER -> roster governor. Many rehearsals are led by a
-  // shepherd, not the governor, so this maps each leader to the hub they belong
-  // to (per your list, confirmed by location where names repeat). Unknown leaders
-  // are left out until added here.
-  var SAT_TO_GOV = {
-    // governors leading their own hub's rehearsal
-    'christiana dzekoe':'Christiana Dzekoe', 'dorcas longdon':'Dorcas Longdon',
-    'hannah-joy adade':'Hannah-Joy Adade', 'joanita djabatey':'Joanita Djabatey',
-    'johanna nakoja':'Johanna Nakoja', 'kezia ogoe':'Keziah Ogoe', 'keziah ogoe':'Keziah Ogoe',
-    'lois nterful':'Lois Nterful', 'michelle william-addo':'Michelle William-Addo',
-    'stephanie bediako':'Stephanie Bediako', 'david aseda':'David Aseda Orleans-Lindsay',
-    // shepherds who led a rehearsal -> their governor
-    'grace fianu':'Christiana Dzekoe',           // Mempeasem
-    'janet thomas':'Kiki Heward-Mills',           // First Love Center
-    'pascaline obaze':'Claudia Quayson',          // Manhea
-    'princess kanu':'Claudia Quayson',            // Ablaykuma
-    'elizabeth akakpo':'Claudia Quayson',         // Kasoa
-    'claudia apaloo':'Claudia Quayson',
-    'sarah ayitey':'Claudia Quayson',             // North Kaneshie
-    'celine ayitey':'Lois Nterful',
-    'elizabeth amuzu':'Lois Nterful',             // Kasoa Dumas school
-    'patience oriella':'Lois Nterful',            // Bubiashie
-    'abigail charis':'Ninette Dodoo',             // Gh Media
-    'lina yartey':'Michelle William-Addo',        // Taifa
-    'lovelace dadzie':'Dorcas Longdon',           // Kolebu
-    'edwin takyi':'Dorcas Longdon',               // Mataheko
-    'bernice':'Helen Feneku',                     // Madina
-    'morgan mensah':'Helen Feneku',               // Mempasem
-    'ayikaikor ankrah':'—', 'sharon-rose nartey':'—'   // Jesus Night hub
-  };
-
-  // Same rehearsal rows, but attributed to the individual SHEPHERD who led them,
-  // so each shepherd's own rehearsal turnout + offering shows on their page.
-  // [governor, shepherd name]  (governor-led rows land on the governor's own entry)
-  var SAT_TO_SHEP = {
-    'janet thomas':['Kiki Heward-Mills','Janet Thomas'],
-    'christiana dzekoe':['Christiana Dzekoe','Christiana Dzekoe'],
-    'pascaline obaze':['Claudia Quayson','Pascaline Obadze'],
-    'princess kanu':['Claudia Quayson','Princess Kanu'],
-    'elizabeth akakpo':['Claudia Quayson','Elizabeth Akakpo'],
-    'claudia apaloo':['Claudia Quayson','Claudia Apaloo'],
-    'sarah ayitey':['Claudia Quayson','Sarah Ayitey'],
-    'celine ayitey':['Lois Nterful','Celine Ayitey'],
-    'patience oriella':['Lois Nterful','Patience Oriella Nortey'],
-    'abigail charis':['Ninette Dodoo','Abigail Charis Adom-Barnor'],
-    'lina yartey':['Michelle William-Addo','Lina Yartey'],
-    'lovelace dadzie':['Dorcas Longdon','Lovelace Dadzie'],
-    'edwin takyi':['Dorcas Longdon','Edwin Takyi'],
-    'bernice':['Helen Feneku','Bernice'],
-    'morgan mensah':['Helen Feneku','Morgan Mensah'],
-    'ayikaikor ankrah':['—','Ayikaikor Ankrah'],
-    'sharon-rose nartey':['—','Sharon Rose Nartey'],
-    'dorcas longdon':['Dorcas Longdon','Dorcas Longdon'],
-    'hannah-joy adade':['Hannah-Joy Adade','Hannah Joy Adade'],
-    'joanita djabatey':['Joanita Djabatey','Joanita Djabatey'],
-    'johanna nakoja':['Johanna Nakoja','Johanna Nakoja'],
-    'kezia ogoe':['Keziah Ogoe','Keziah Ogoe'],
-    'lois nterful':['Lois Nterful','Lois Nterful'],
-    'michelle william-addo':['Michelle William-Addo','Michelle William-Addo'],
-    'stephanie bediako':['Stephanie Bediako','Stephanie Bediako'],
-    'david aseda':['David Aseda Orleans-Lindsay','David Aseda Orleans-Lindsay']
+  // Rehearsal leaders & Sunday submitters are matched to a roster shepherd BY NAME
+  // (they now use full names). This alias table only covers spelling variants where
+  // the form name differs from the roster name — everything else matches directly,
+  // so new reporters are picked up automatically. Value = the roster shepherd's name.
+  var SHEP_ALIAS = {
+    'helen fenuku':'Helen Feneku',
+    'kezia ogoe':'Keziah Ogoe',
+    'david aseda':'David Aseda Orleans-Lindsay',
+    'sharon-rose nartey':'Sharon Rose Nartey',
+    'pascaline obaze':'Pascaline Obadze',
+    'hannah-joy adade':'Hannah Joy Adade',
+    'abigail charis':'Abigail Charis Adom-Barnor',
+    'patience oriella':'Patience Oriella Nortey'
   };
 
   function norm(s){ return String(s == null ? '' : s).toLowerCase().replace(/\s+/g,' ').trim(); }
@@ -266,42 +218,40 @@ window.GLGC = (function () {
       return o;
     });
 
-    // aggregate each rehearsal row onto its hub (governor) AND the leader (shepherd),
-    // and keep the raw per-week submissions (every reporting hub, incl. any not on
-    // the roster) for the week-by-week breakdown.
-    var satByGov={};
-    var satWeekly=weeks.map(function(){ return {}; });   // weekIdx -> {leader|loc -> {name,location,att,off}}
+    // resolve a reporter name (rehearsal leader or Sunday submitter) to a roster shepherd.
+    function resolveShep(normName){
+      var canon=SHEP_ALIAS[normName];
+      var s=shepByName[canon?norm(canon):normName];
+      return (s && typeof s==='object') ? s : null;   // null = unmatched or an ambiguous name
+    }
+    var unmatched={};
+
+    // Rehearsal (Saturday) -> the shepherd who led it. Governor & choir totals are the
+    // SUM of their shepherds, so a choir's attendance always equals its shepherds added up.
+    var satWeekly=weeks.map(function(){ return {}; });   // weekIdx -> raw per-submission (for the by-hub view)
     sat.forEach(function(row){
       var i=weekIndexFor(row.date); if(i<0) return;
-      var gov=SAT_TO_GOV[row.leader];
-      if(gov){ var g=satByGov[gov]||(satByGov[gov]={}); var cg=g[i]||(g[i]={att:0,off:0}); cg.att+=row.att; cg.off+=row.off; }
-      var sk=SAT_TO_SHEP[row.leader];
-      if(sk){ var so=shepByKey[sk[0]+'|'+sk[1]]; if(so){ var cs=so._sat[i]||(so._sat[i]={att:0,off:0}); cs.att+=row.att; cs.off+=row.off; } }
+      var sh=resolveShep(row.leader);
+      if(sh){ var cs=sh._sat[i]||(sh._sat[i]={att:0,off:0}); cs.att+=row.att; cs.off+=row.off; }
+      else if(row.leader) unmatched['rehearsal — '+row.leaderRaw]=1;
       var key=row.leader+'|'+row.location.toLowerCase();
       var cell=satWeekly[i][key]||(satWeekly[i][key]={name:row.leaderRaw, location:row.location, att:0, off:0});
       cell.att+=row.att; cell.off+=row.off;
     });
-    // flatten to sorted arrays per week
     satWeekly=satWeekly.map(function(b){
       return Object.keys(b).map(function(k){ return b[k]; })
         .sort(function(a,b){ return a.name.localeCompare(b.name); });
     });
 
-    // per-shepherd Sunday form -> onto the shepherd, their governor, and their choir.
-    // Uses the form's own choir field so the choir total captures everyone, even
-    // any submitter not on the roster.
-    var sun2ByGov={}, sun2ByChoir={};
+    // Per-shepherd Sunday form (from 5 Jul) -> the shepherd who submitted.
     sun2.forEach(function(row){
       var i=weekIndexFor(row.date); if(i<0) return;
-      var ch=sun2ByChoir[row.choir]||(sun2ByChoir[row.choir]={}); ch[i]=(ch[i]||0)+row.att;
-      var sh=shepByCS[row.choir+'|'+row.shep] || shepByName[row.shep];
-      if(sh){
-        sh._sun[i]=(sh._sun[i]||0)+row.att;
-        var g=sun2ByGov[sh.governor]||(sun2ByGov[sh.governor]={}); g[i]=(g[i]||0)+row.att;
-      }
+      var sh=resolveShep(row.shep);
+      if(sh){ sh._sun[i]=(sh._sun[i]||0)+row.att; }
+      else if(row.shep) unmatched['sunday — '+row.shepRaw]=1;
     });
 
-    // shepherd points — their own rehearsal turnout + offering, and (from 5 Jul) their Sunday attendance
+    // shepherd points — rehearsal turnout + offering, and (from 5 Jul) Sunday attendance
     shepherds.forEach(function(s){
       s.points=weeks.map(function(w,i){
         var c=s._sat[i], su=s._sun[i];
@@ -313,28 +263,27 @@ window.GLGC = (function () {
     });
     var byId={}; shepherds.forEach(function(s){ byId[s.id]=s; });
 
-    // governors (hubs) — real Sunday + Saturday points where matched
+    // governors (hubs) — every total is the SUM of the hub's shepherds. Sunday also
+    // uses the historical per-governor matrix for pre-July weeks where it exists.
     var govMap={};
     ROSTER.hubs.forEach(function(hub){
-      var shepIds=shepherds.filter(function(s){
-        return s.choir===hub.choir && s.governor===hub.governor;
-      }).map(function(s){ return s.id; });
-      if(!shepIds.length) return;
+      var hubShep=shepherds.filter(function(s){ return s.choir===hub.choir && s.governor===hub.governor; });
+      if(!hubShep.length) return;
+      var shepIds=hubShep.map(function(s){ return s.id; });
       var gid=slug(hub.choir)+'__'+slug(hub.governor);
       var sunVals=sun.byGov[hub.governor]||null;
-      var satVals=satByGov[hub.governor]||null;
-      var sun2Gov=sun2ByGov[hub.governor]||null;
       var points=weeks.map(function(w,i){
+        var satP=null, off=null, sunP=null;
+        hubShep.forEach(function(s){
+          var p=s.points[i];
+          if(p.satPresent!=null) satP=(satP||0)+p.satPresent;
+          if(p.offering!=null)   off=(off||0)+p.offering;
+          if(p.sunPresent!=null) sunP=(sunP||0)+p.sunPresent;
+        });
         var si=sunIdxByTime[w.sunDate.getTime()];
-        // historical matrix Sunday where it exists, else the new per-shepherd form total
-        var sp=(sunVals && si!=null)?sunVals[si]:null;
-        if(sp==null && sun2Gov && sun2Gov[i]!=null) sp=sun2Gov[i];
-        var sat=satVals&&satVals[i]?satVals[i]:null;
-        return { week:w.week, label:w.label,
-          sunPresent:(sp==null?null:sp),
-          satPresent:(sat?sat.att:null),
-          offering:(sat?sat.off:null),
-          roster:shepIds.length };
+        var mSun=(sunVals && si!=null)?sunVals[si]:null;   // historical hub headcount
+        if(mSun!=null) sunP=mSun;
+        return { week:w.week, label:w.label, satPresent:satP, offering:off, sunPresent:sunP, roster:shepIds.length };
       });
       govMap[gid]={ id:gid, governor:hub.governor, choir:hub.choir,
         shepherdIds:shepIds, roster:shepIds.length, membership:shepIds.length,
@@ -354,14 +303,10 @@ window.GLGC = (function () {
     var choirs=choirNames.map(function(cn){
       var govs=governors.filter(function(g){ return g.choir===cn; });
       var shepIds=[]; govs.forEach(function(g){ shepIds=shepIds.concat(g.shepherdIds); });
-      var cNorm=norm(cn);
       var points=weeks.map(function(w,i){
-        // historical matrix weeks: sum governors; new form weeks: choir total from the form
-        var sp;
-        if(sunIdxByTime[w.sunDate.getTime()]!=null) sp=sumField(govs,i,'sunPresent');
-        else { var c=sun2ByChoir[cNorm]; sp=(c && c[i]!=null)?c[i]:null; }
+        // every choir total = sum of its governors, which each = sum of their shepherds
         return { week:w.week, label:w.label,
-          sunPresent:sp,
+          sunPresent:sumField(govs,i,'sunPresent'),
           satPresent:sumField(govs,i,'satPresent'),
           offering:sumField(govs,i,'offering'),
           roster:shepIds.length };
@@ -382,7 +327,8 @@ window.GLGC = (function () {
     });
 
     return { weeks:weeks, shepherds:shepherds, byId:byId,
-             governors:governors, choirs:choirs, weekly:weekly, satWeekly:satWeekly };
+             governors:governors, choirs:choirs, weekly:weekly, satWeekly:satWeekly,
+             unmatched:Object.keys(unmatched).sort() };
   }
 
   // ---- shared chart helpers -------------------------------------------------
