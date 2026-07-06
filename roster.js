@@ -75,7 +75,8 @@
       ['Elizabeth Amuzu', null] ] },
 
     { choir: 'Unfeigned Love Singers', governor: 'Ninette Dodoo', shepherds: [
-      ['Abigail Charis Adom-Barnor', null], ['Kofi Annan', '0233678900'] ] },
+      ['Ninette Dodoo', '0536153301'], ['Abigail Charis Adom-Barnor', null],
+      ['Kofi Annan', '0233678900'] ] },
 
     { choir: 'Jesus Night Choir', governor: '—', shepherds: [
       ['Ayikaikor Ankrah', '+233209917512'], ['Sharon Rose Nartey', '+233201919670'] ] }
