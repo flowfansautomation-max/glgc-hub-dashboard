@@ -13,6 +13,8 @@ window.GLGC = (function () {
   // ---- live sources ---------------------------------------------------------
   var SUN_ID = '1rXQDsGNKxZFZBa7PA_aMmwrgRIwAiJiHcRo-pC2y05o', SUN_SHEET = 'Attendance';
   var SAT_ID = '1ZVpZ9LtsKZX0h3_bbXb3OLuTKrVxG5W3KJS8UEMdUgg';
+  // New per-shepherd Sunday form (responses), live from 5 July 2026 onward.
+  var SUN2_ID = '1WPWrsr1ZjLJS2TfculSceh3cDMz4ZiRcCZTnhMNrQog';
 
   // Normalized sheet name -> your roster governor's display name.
   // Handles the spelling differences between the sheets and your list.
@@ -135,19 +137,22 @@ window.GLGC = (function () {
     var got={}, done=false;
     function fail(e){ if(!done){ done=true; (onErr||function(){})(e); } }
     function ready(){
-      if(got.sun && got.sat && !done){
+      if(got.sun && got.sat && got.sun2 && !done){
         done=true;
-        try { cb(build(parseSun(got.sun), parseSat(got.sat))); }
+        try { cb(build(parseSun(got.sun), parseSat(got.sat), parseSun2(got.sun2))); }
         catch(e){ (onErr||function(){})(e); }
       }
     }
     window.__glgcSun=function(r){ got.sun=r; ready(); };
     window.__glgcSat=function(r){ got.sat=r; ready(); };
+    window.__glgcSun2=function(r){ got.sun2=r; ready(); };
     inject('https://docs.google.com/spreadsheets/d/'+SUN_ID+
       '/gviz/tq?tqx=out:json;responseHandler:__glgcSun&sheet='+encodeURIComponent(SUN_SHEET)+
       '&range=A2:AZ500&headers=1', fail);
     inject('https://docs.google.com/spreadsheets/d/'+SAT_ID+
       '/gviz/tq?tqx=out:json;responseHandler:__glgcSat', fail);
+    inject('https://docs.google.com/spreadsheets/d/'+SUN2_ID+
+      '/gviz/tq?tqx=out:json;responseHandler:__glgcSun2', fail);
   }
   function inject(url, fail){
     var s=document.createElement('script'); s.src=url;
@@ -197,8 +202,27 @@ window.GLGC = (function () {
     return rows;
   }
 
+  // ---- parse the new per-shepherd Sunday form ------------------------------
+  // Columns: Timestamp | Date | Service | Name of Choir | Name of Shepherd | Attendance | ...
+  function parseSun2(resp){
+    var cols=resp.table.cols.map(function(c){ return norm(c.label); });
+    function find(){ for(var i=0;i<arguments.length;i++){ var k=cols.indexOf(arguments[i]); if(k>=0) return k; } return -1; }
+    var iDate=find('date'), iChoir=find('name of choir'), iShep=find('name of shepherd'), iAtt=find('attendance');
+    var rows=[];
+    (resp.table.rows||[]).forEach(function(r){
+      var c=r.c||[];
+      var d=parseGvizDate(c[iDate]&&c[iDate].v); if(!d) return;
+      var shepRaw=String((c[iShep]&&c[iShep].v)||'').trim(); if(!shepRaw) return;
+      var choirRaw=String((c[iChoir]&&c[iChoir].v)||'').trim();
+      rows.push({ date:d, choirRaw:choirRaw, choir:norm(choirRaw),
+        shepRaw:shepRaw, shep:norm(shepRaw), att:+(c[iAtt]&&c[iAtt].v)||0 });
+    });
+    return rows;
+  }
+
   // ---- build MODEL onto the roster ------------------------------------------
-  function build(sun, sat){
+  function build(sun, sat, sun2){
+    sun2 = sun2 || [];
     // The service Sunday for any rehearsal date = the Sunday on/after it.
     function nextSunday(d){
       var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
@@ -206,10 +230,11 @@ window.GLGC = (function () {
       return x;
     }
     // Weeks = the Sunday columns PLUS any newer week that already has rehearsal
-    // data, so "this week" appears even before its Sunday column exists.
+    // or per-shepherd Sunday data, so "this week" appears even before its column exists.
     var weekMap={};
     sun.weekCols.forEach(function(w){ weekMap[w.date.getTime()]=w.date; });
     sat.forEach(function(row){ var s=nextSunday(row.date); weekMap[s.getTime()]=s; });
+    sun2.forEach(function(row){ var s=nextSunday(row.date); weekMap[s.getTime()]=s; });
     var weeks=Object.keys(weekMap).map(function(k){ return weekMap[k]; })
       .sort(function(a,b){ return a-b; })
       .map(function(sunD){
@@ -227,12 +252,17 @@ window.GLGC = (function () {
       return -1;
     }
 
-    // shepherds skeleton + a (governor|name -> shepherd) lookup for attribution
-    var shepByKey={};
+    // shepherds skeleton + lookups for attribution
+    var shepByKey={};   // governor|name (for Saturday SAT_TO_SHEP)
+    var shepByCS={};    // choirNorm|nameNorm (for the Sunday form)
+    var shepByName={};  // nameNorm -> shepherd if unique
     var shepherds=ROSTER.shepherds.map(function(s){
       var o={ id:s.id, name:s.name, phone:s.phone, choir:s.choir,
-        governor:s.governor, governorId:s.governorId, photoKey:s.photoKey, _sat:{} };
+        governor:s.governor, governorId:s.governorId, photoKey:s.photoKey, _sat:{}, _sun:{} };
       shepByKey[s.governor+'|'+s.name]=o;
+      shepByCS[norm(s.choir)+'|'+norm(s.name)]=o;
+      var nk=norm(s.name);
+      shepByName[nk] = shepByName[nk] ? null : o;   // null marks an ambiguous name
       return o;
     });
 
@@ -257,15 +287,29 @@ window.GLGC = (function () {
         .sort(function(a,b){ return a.name.localeCompare(b.name); });
     });
 
-    // shepherd points — their own rehearsal turnout + offering (Sunday per-shepherd not tracked yet)
+    // per-shepherd Sunday form -> onto the shepherd, their governor, and their choir.
+    // Uses the form's own choir field so the choir total captures everyone, even
+    // any submitter not on the roster.
+    var sun2ByGov={}, sun2ByChoir={};
+    sun2.forEach(function(row){
+      var i=weekIndexFor(row.date); if(i<0) return;
+      var ch=sun2ByChoir[row.choir]||(sun2ByChoir[row.choir]={}); ch[i]=(ch[i]||0)+row.att;
+      var sh=shepByCS[row.choir+'|'+row.shep] || shepByName[row.shep];
+      if(sh){
+        sh._sun[i]=(sh._sun[i]||0)+row.att;
+        var g=sun2ByGov[sh.governor]||(sun2ByGov[sh.governor]={}); g[i]=(g[i]||0)+row.att;
+      }
+    });
+
+    // shepherd points — their own rehearsal turnout + offering, and (from 5 Jul) their Sunday attendance
     shepherds.forEach(function(s){
       s.points=weeks.map(function(w,i){
-        var c=s._sat[i];
+        var c=s._sat[i], su=s._sun[i];
         return { week:w.week, label:w.label, satPresent:(c?c.att:null),
-                 offering:(c?c.off:null), sunPresent:null, roster:1 };
+                 offering:(c?c.off:null), sunPresent:(su==null?null:su), roster:1 };
       });
-      s.hasData=s.points.some(function(p){ return p.satPresent!=null||p.offering!=null; });
-      delete s._sat;
+      s.hasData=s.points.some(function(p){ return p.satPresent!=null||p.offering!=null||p.sunPresent!=null; });
+      delete s._sat; delete s._sun;
     });
     var byId={}; shepherds.forEach(function(s){ byId[s.id]=s; });
 
@@ -279,9 +323,12 @@ window.GLGC = (function () {
       var gid=slug(hub.choir)+'__'+slug(hub.governor);
       var sunVals=sun.byGov[hub.governor]||null;
       var satVals=satByGov[hub.governor]||null;
+      var sun2Gov=sun2ByGov[hub.governor]||null;
       var points=weeks.map(function(w,i){
         var si=sunIdxByTime[w.sunDate.getTime()];
+        // historical matrix Sunday where it exists, else the new per-shepherd form total
         var sp=(sunVals && si!=null)?sunVals[si]:null;
+        if(sp==null && sun2Gov && sun2Gov[i]!=null) sp=sun2Gov[i];
         var sat=satVals&&satVals[i]?satVals[i]:null;
         return { week:w.week, label:w.label,
           sunPresent:(sp==null?null:sp),
@@ -307,9 +354,14 @@ window.GLGC = (function () {
     var choirs=choirNames.map(function(cn){
       var govs=governors.filter(function(g){ return g.choir===cn; });
       var shepIds=[]; govs.forEach(function(g){ shepIds=shepIds.concat(g.shepherdIds); });
+      var cNorm=norm(cn);
       var points=weeks.map(function(w,i){
+        // historical matrix weeks: sum governors; new form weeks: choir total from the form
+        var sp;
+        if(sunIdxByTime[w.sunDate.getTime()]!=null) sp=sumField(govs,i,'sunPresent');
+        else { var c=sun2ByChoir[cNorm]; sp=(c && c[i]!=null)?c[i]:null; }
         return { week:w.week, label:w.label,
-          sunPresent:sumField(govs,i,'sunPresent'),
+          sunPresent:sp,
           satPresent:sumField(govs,i,'satPresent'),
           offering:sumField(govs,i,'offering'),
           roster:shepIds.length };
