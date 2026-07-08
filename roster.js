@@ -11,8 +11,8 @@
   }
 
   var RAW = [
-    { choir: 'Love Is Large Choir', governor: 'Kiki Heward-Mills', shepherds: [
-      ['Cindy Williams', '0245599923'], ['Janet Thomas', '0256875377'],
+    { choir: 'Love Is Large Choir', governor: 'Janet Thomas', shepherds: [
+      ['Janet Thomas', '0256875377'], ['Cindy Williams', '0245599923'],
       ['Lucia Adusei', '0549556476'], ['Cherrilyn Davies', null] ] },
 
     { choir: 'Love Is Large Choir', governor: 'Christiana Dzekoe', shepherds: [
@@ -80,8 +80,11 @@
       ['Ninette Dodoo', '0536153301'], ['Abigail Charis Adom-Barnor', null],
       ['Kofi Annan', '0233678900'] ] },
 
-    { choir: 'Jesus Night Choir', governor: '—', shepherds: [
-      ['Ayikaikor Ankrah', '+233209917512'], ['Sharon Rose Nartey', '+233201919670'] ] }
+    { choir: 'Jesus Night Choir', governor: 'Ayikaikor Ankrah', shepherds: [
+      ['Ayikaikor Ankrah', '+233209917512'] ] },
+
+    { choir: 'Jesus Night Choir', governor: 'Sharon Rose Nartey', shepherds: [
+      ['Sharon Rose Nartey', '+233201919670'] ] }
   ];
 
   var shepherds = [];

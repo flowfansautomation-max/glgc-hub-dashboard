@@ -19,7 +19,7 @@ window.GLGC = (function () {
   // Normalized sheet name -> your roster governor's display name.
   // Handles the spelling differences between the sheets and your list.
   var SHEET_TO_GOV = {
-    'kiki heward-mills':'Kiki Heward-Mills', 'kiki heward mills':'Kiki Heward-Mills',
+    'kiki heward-mills':'Janet Thomas', 'kiki heward mills':'Janet Thomas',   // hub now led by Janet Thomas
     'lois dorothy nteful':'Lois Nterful', 'lois nterful':'Lois Nterful', 'lois nteful':'Lois Nterful',
     'ninette dodoo':'Ninette Dodoo',
     'keziah ogoe':'Keziah Ogoe', 'kezia ogoe':'Keziah Ogoe',
