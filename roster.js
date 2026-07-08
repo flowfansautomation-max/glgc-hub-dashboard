@@ -13,7 +13,7 @@
   var RAW = [
     { choir: 'Love Is Large Choir', governor: 'Kiki Heward-Mills', shepherds: [
       ['Cindy Williams', '0245599923'], ['Janet Thomas', '0256875377'],
-      ['Lucia Adusei', '0549556476'] ] },
+      ['Lucia Adusei', '0549556476'], ['Cherrilyn Davies', null] ] },
 
     { choir: 'Love Is Large Choir', governor: 'Christiana Dzekoe', shepherds: [
       ['Christiana Dzekoe', null], ['Grace Fianu', '0535231068'] ] },
@@ -37,7 +37,7 @@
       ['Hannah Joy Adade', '0574061899'] ] },
 
     { choir: 'Love Is Kind Choir', governor: 'Keziah Ogoe', shepherds: [
-      ['Keziah Ogoe', '0541508852'] ] },
+      ['Keziah Ogoe', '0541508852'], ['Vanessa Boakye', null] ] },
 
     { choir: 'Abundant Love Choir', governor: 'Michelle William-Addo', shepherds: [
       ['Michelle William-Addo', '0245710529'], ['Lina Yartey', '0257574804'],
@@ -51,13 +51,14 @@
       ['Emmanuel Owiredu', '0595228643'] ] },
 
     { choir: 'Peace And Love Singers', governor: 'Rejoice Amartey', shepherds: [
-      ['Rejoice Amartey', '0543150768'], ['Ruby Aggrey', '+233501362846'] ] },
+      ['Rejoice Amartey', '0543150768'], ['Ruby Aggrey', '+233501362846'],
+      ['Clara Aggrey', null] ] },
 
     { choir: 'Peace And Love Singers', governor: 'Davidina Adagbe', shepherds: [
       ['Davidina Adagbe', '0207142392'] ] },
 
     { choir: 'Perfect Love Choir', governor: 'David Aseda Orleans-Lindsay', shepherds: [
-      ['David Aseda Orleans-Lindsay', '0593435949'] ] },
+      ['David Aseda Orleans-Lindsay', '0593435949'], ['Abraham Dogbe', null] ] },
 
     { choir: 'Steadfast Love Choir', governor: 'Johanna Nakoja', shepherds: [
       ['Johanna Nakoja', '0545068460'], ['Fortune Esedinam Adiraki Gbolo', '0205508004'] ] },
@@ -67,7 +68,8 @@
 
     { choir: 'True Love Choir', governor: 'Dorcas Longdon', shepherds: [
       ['Dorcas Longdon', '0266459254'], ['David Buckman', '0248417478'],
-      ['Lovelace Dadzie', '0204959173'], ['Edwin Takyi', '0240084722'] ] },
+      ['Lovelace Dadzie', '0204959173'], ['Edwin Takyi', '0240084722'],
+      ['Abigail Quartey', '0546780169'] ] },
 
     { choir: 'Love Is Patient Choir', governor: 'Lois Nterful', shepherds: [
       ['Lois Nterful', '0559682426'], ['Celine Ayitey', '0240096784'],
