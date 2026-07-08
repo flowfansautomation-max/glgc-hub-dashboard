@@ -53,7 +53,16 @@ window.GLGC = (function () {
     'pascaline obaze':'Pascaline Obadze',
     'hannah-joy adade':'Hannah Joy Adade',
     'abigail charis':'Abigail Charis Adom-Barnor',
-    'patience oriella':'Patience Oriella Nortey'
+    'patience oriella':'Patience Oriella Nortey',
+    // renamed shepherds — keep matching what people type in the forms
+    'claudia apaloo':'Claudia Quayson',
+    'bernice':'Bernice Dissou',
+    'stephen':'Stephen Yartey',
+    'nathaniel bamfo':'Nathaniel Kwame Amissah',
+    'nathaniel':'Nathaniel Kwame Amissah',
+    'jeffrey lamptey':'Rev Jeffrey Lamptey',
+    'honesty':'Honesty Leticia Abba',
+    'ruby':'Ruby Aggrey'
   };
 
   function norm(s){ return String(s == null ? '' : s).toLowerCase().replace(/\s+/g,' ').trim(); }

@@ -19,15 +19,16 @@
       ['Christiana Dzekoe', null], ['Grace Fianu', '0535231068'] ] },
 
     { choir: 'Love Never Fails Choir', governor: 'RJ (Rev Jeffrey Lamptey)', shepherds: [
-      ['Lawrence Adusu', '0209222199'] ] },
+      ['Rev Jeffrey Lamptey', '0249405200'], ['Lawrence Adusu', '0209222199'] ] },
 
     { choir: 'Love Never Fails Choir', governor: 'Claudia Quayson', shepherds: [
-      ['Claudia Apaloo', '0549776091'], ['Elizabeth Akakpo', '0592490004'],
+      ['Claudia Quayson', '0549776091'], ['Elizabeth Akakpo', '0592490004'],
       ['Pascaline Obadze', '0555709524'], ['Princess Kanu', '0543207014'],
       ['Sarah Ayitey', null] ] },
 
     { choir: 'God So Loved Choir', governor: 'Stephanie Bediako', shepherds: [
-      ['Stephanie Bediako', '0557313151'], ['Nathaniel Bamfo', '0592622632'] ] },
+      ['Stephanie Bediako', '0557313151'], ['Nathaniel Kwame Amissah', '0592622632'],
+      ['Honesty Leticia Abba', '0546382842'] ] },
 
     { choir: 'God So Loved Choir', governor: 'Dorcas Poku', shepherds: [
       ['Dorcas Poku', '0208600307'] ] },
@@ -40,23 +41,23 @@
 
     { choir: 'Abundant Love Choir', governor: 'Michelle William-Addo', shepherds: [
       ['Michelle William-Addo', '0245710529'], ['Lina Yartey', '0257574804'],
-      ['Stephen', '0504153331'] ] },
+      ['Stephen Yartey', '0504153331'] ] },
 
     { choir: 'Abundant Love Choir', governor: 'Helen Feneku', shepherds: [
-      ['Helen Feneku', '0201974618'], ['Bernice', '0532654322'],
+      ['Helen Feneku', '0201974618'], ['Bernice Dissou', '0532654322'],
       ['Morgan Mensah', null] ] },
 
     { choir: 'Peace And Love Singers', governor: 'Emmanuel Owiredu', shepherds: [
       ['Emmanuel Owiredu', '0595228643'] ] },
 
     { choir: 'Peace And Love Singers', governor: 'Rejoice Amartey', shepherds: [
-      ['Rejoice Amartey', '0543150768'] ] },
+      ['Rejoice Amartey', '0543150768'], ['Ruby Aggrey', '+233501362846'] ] },
 
     { choir: 'Peace And Love Singers', governor: 'Davidina Adagbe', shepherds: [
       ['Davidina Adagbe', '0207142392'] ] },
 
     { choir: 'Perfect Love Choir', governor: 'David Aseda Orleans-Lindsay', shepherds: [
-      ['David Aseda Orleans-Lindsay', '0593435949'], ['Abraham Dogbe', null] ] },
+      ['David Aseda Orleans-Lindsay', '0593435949'] ] },
 
     { choir: 'Steadfast Love Choir', governor: 'Johanna Nakoja', shepherds: [
       ['Johanna Nakoja', '0545068460'], ['Fortune Esedinam Adiraki Gbolo', '0205508004'] ] },
@@ -66,8 +67,7 @@
 
     { choir: 'True Love Choir', governor: 'Dorcas Longdon', shepherds: [
       ['Dorcas Longdon', '0266459254'], ['David Buckman', '0248417478'],
-      ['Lovelace Dadzie', '0204959173'], ['Edwin Takyi', '0240084722'],
-      ['Abigail Quartey', '0546780169'] ] },
+      ['Lovelace Dadzie', '0204959173'], ['Edwin Takyi', '0240084722'] ] },
 
     { choir: 'Love Is Patient Choir', governor: 'Lois Nterful', shepherds: [
       ['Lois Nterful', '0559682426'], ['Celine Ayitey', '0240096784'],
