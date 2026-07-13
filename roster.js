@@ -66,7 +66,7 @@
       ['Johanna Nakoja', '0545068460'], ['Fortune Esedinam Adiraki Gbolo', '0205508004'] ] },
 
     { choir: 'Steadfast Love Choir', governor: 'Joanita Djabatey', shepherds: [
-      ['Joanita Djabatey', '0553833171'], ['Papa Yaw Ashun', '0551130050'] ] },
+      ['Joanita Djabatey', '0553833171'] ] },
 
     { choir: 'True Love Choir', governor: 'Dorcas Longdon', shepherds: [
       ['Dorcas Longdon', '0266459254'], ['David Buckman', '0248417478'],
