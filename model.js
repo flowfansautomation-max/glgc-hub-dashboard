@@ -377,6 +377,7 @@ window.GLGC = (function () {
     return name.split(/[\s\-]+/).filter(Boolean).slice(0,2)
       .map(function(w){ return w.charAt(0); }).join('').toUpperCase();
   }
+  var PHOTO_VER='3';   // bump whenever photos are added/updated so browsers refetch
   function setAvatar(imgEl, initEl, key, name){
     var exts=['jpg','jpeg','png','webp'], i=0;
     initEl.textContent=initials(name); initEl.style.display='flex'; imgEl.style.display='none';
@@ -384,7 +385,7 @@ window.GLGC = (function () {
       if(i>=exts.length) return;
       imgEl.onload=function(){ imgEl.style.display='block'; initEl.style.display='none'; };
       imgEl.onerror=function(){ i++; tryNext(); };
-      imgEl.src='photos/'+encodeURIComponent(key)+'.'+exts[i];
+      imgEl.src='photos/'+encodeURIComponent(key)+'.'+exts[i]+'?v='+PHOTO_VER;
     })();
   }
 
