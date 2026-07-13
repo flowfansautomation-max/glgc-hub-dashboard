@@ -35,18 +35,17 @@
 <body>
   <div class="wrap">
     <div class="nav">
-      <a href="index.html">Per Hub</a>
-      <a href="all.html" class="active">All Hubs</a>
-      <a href="summary.html">Weekly Summary</a>
       <a href="slides.html">Slideshow</a>
+      <a href="all.html" class="active">Per Choir</a>
+      <a href="summary.html">Overall Summary</a>
     </div>
-    <div class="title">ALL HUBS COMPARED</div>
-    <div class="sub">Every hub side by side for one week</div>
+    <div class="title">PER CHOIR</div>
+    <div class="sub">Every choir (or hub) side by side for one week</div>
     <div class="picker">
       <select id="week" onchange="render()"></select>
       <select id="view" onchange="render()">
-        <option value="gov">By governor (hub)</option>
         <option value="choir">By choir</option>
+        <option value="gov">By governor (hub)</option>
       </select>
     </div>
 
