@@ -23,8 +23,10 @@
 
     { choir: 'Love Never Fails Choir', governor: 'Claudia Quayson', shepherds: [
       ['Claudia Quayson', '0549776091'], ['Elizabeth Akakpo', '0592490004'],
-      ['Pascaline Obadze', '0555709524'], ['Princess Kanu', '0543207014'],
-      ['Sarah Ayitey', null] ] },
+      ['Pascaline Obadze', '0555709524'], ['Sarah Ayitey', null] ] },
+
+    { choir: 'Love Never Fails Choir', governor: 'Princess Kanu', shepherds: [
+      ['Princess Kanu', '0543207014'] ] },
 
     { choir: 'God So Loved Choir', governor: 'Stephanie Bediako', shepherds: [
       ['Stephanie Bediako', '0557313151'], ['Nathaniel Kwame Amissah', '0592622632'],
@@ -72,8 +74,13 @@
       ['Abigail Quartey', '0546780169'] ] },
 
     { choir: 'Love Is Patient Choir', governor: 'Lois Nterful', shepherds: [
-      ['Lois Nterful', '0559682426'], ['Celine Ayitey', '0240096784'],
-      ['Patience Oriella Nortey', null], ['Christabelle Amoo-Gottfried', null],
+      ['Lois Nterful', '0559682426'],
+      ['Patience Oriella Nortey', null], ['Christabelle Amoo-Gottfried', null] ] },
+
+    { choir: 'Love Is Patient Choir', governor: 'Celine Ayitey', shepherds: [
+      ['Celine Ayitey', '0240096784'] ] },
+
+    { choir: 'Love Is Patient Choir', governor: 'Elizabeth Amuzu', shepherds: [
       ['Elizabeth Amuzu', null] ] },
 
     { choir: 'Unfeigned Love Singers', governor: 'Ninette Dodoo', shepherds: [
