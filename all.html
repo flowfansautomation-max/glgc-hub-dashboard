@@ -97,8 +97,7 @@
       // ---- Rehearsal attendance + offering (one graph) ----
       var reh = groups.map(function (g) {
         return { label: labelOf(g), att: g.points[wi].satPresent, off: g.points[wi].offering };
-      }).filter(function (r) { return r.att != null || r.off != null; })
-        .sort(function (a, b) { return (b.att || 0) - (a.att || 0); });
+      }).filter(function (r) { return r.att != null || r.off != null; });
       var hasReh = reh.length > 0;
       toggle('rehInner', 'rehEmpty', hasReh);
       if (hasReh) {
@@ -122,8 +121,7 @@
       // ---- Sunday attendance ----
       var sun = groups.map(function (g) {
         return { label: labelOf(g), v: g.points[wi].sunPresent };
-      }).filter(function (r) { return r.v != null; })
-        .sort(function (a, b) { return b.v - a.v; });
+      }).filter(function (r) { return r.v != null; });
       var hasSun = sun.length > 0;
       toggle('sunInner', 'sunEmpty', hasSun);
       if (hasSun) {
