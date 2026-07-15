@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GLGC Hub Dashboard — All Hubs</title>
+  <title>GLGC Hub Dashboard — Per Governor</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="roster.js?v=32"></script>
   <script src="model.js?v=32"></script>
@@ -36,17 +36,13 @@
   <div class="wrap">
     <div class="nav">
       <a href="slides.html">Slideshow</a>
-      <a href="all.html" class="active">Per Choir</a>
+      <a href="all.html" class="active">Per Governor</a>
       <a href="summary.html">Overall Summary</a>
     </div>
-    <div class="title">PER CHOIR</div>
-    <div class="sub">Every choir (or hub) side by side for one week</div>
+    <div class="title">PER GOVERNOR</div>
+    <div class="sub">Every hub (governor) side by side for one week</div>
     <div class="picker">
       <select id="week" onchange="render()"></select>
-      <select id="view" onchange="render()">
-        <option value="choir">By choir</option>
-        <option value="gov">By governor (hub)</option>
-      </select>
     </div>
 
     <div class="section">
@@ -92,11 +88,8 @@
     function render() {
       if (!MODEL) return;
       var wi = +document.getElementById('week').value;
-      var view = document.getElementById('view').value;
-      var groups = view === 'choir' ? MODEL.choirs : MODEL.governors;
-      function labelOf(g) {
-        return view === 'choir' ? g.choir : [g.governor, shortChoir(g.choir)];
-      }
+      var groups = MODEL.governors;
+      function labelOf(g) { return [g.governor, shortChoir(g.choir)]; }
       var xAxis = { ticks:{color:'#ddd',font:{size:11}}, grid:{color:'#1e1e1e'} };
       var peopleAxis = { beginAtZero:true, grace:'14%', position:'left',
         title:{display:true,text:'People',color:'#888'}, ticks:{color:'#ddd'}, grid:{color:'#1e1e1e'} };
