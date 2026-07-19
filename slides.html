@@ -111,29 +111,18 @@
     // fills a chart's canvas black so exports match the dark dashboard look
     var blackBg = { id:'blackBg', beforeDraw:function(c){ var x=c.ctx; x.save(); x.fillStyle='#000'; x.fillRect(0,0,c.width,c.height); x.restore(); } };
 
-    // An individual's attendance above this looks like a whole-hub headcount typed
-    // in by mistake — flag it (red + ⚠) so it can be corrected in the form.
-    var FLAG_ABOVE = 15;
-
-    // draws every value INCLUDING 0 (so a "didn't fill" week shows a 0, not a blank); skips null.
-    // attendance values that are suspiciously high (ds.flagHigh) are drawn red with a ⚠.
+    // draws every value INCLUDING 0 (so a "didn't fill" week shows a 0, not a blank); skips null
     var valueLabels0 = { id:'valueLabels0', afterDatasetsDraw:function(chart){
       var ctx=chart.ctx;
       chart.data.datasets.forEach(function(ds,di){
         var meta=chart.getDatasetMeta(di); if(meta.hidden) return;
         meta.data.forEach(function(bar,i){
           var v=ds.data[i]; if(v==null) return;
-          var hot = ds.flagHigh && v > FLAG_ABOVE;
-          ctx.save();
-          ctx.fillStyle = hot ? '#ff5a4d' : '#fff';
-          ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
-          ctx.fillText(hot ? ('⚠ ' + v) : v, bar.x, bar.y - 5);
-          ctx.restore();
+          ctx.save(); ctx.fillStyle='#fff'; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+          ctx.fillText(v, bar.x, bar.y-5); ctx.restore();
         });
       });
     }};
-    function flagBorder(arr){ return { color: arr.map(function(v){ return (v!=null && v>FLAG_ABOVE) ? '#ff5a4d' : 'rgba(0,0,0,0)'; }),
-                                       width: arr.map(function(v){ return (v!=null && v>FLAG_ABOVE) ? 3 : 0; }) }; }
 
     function weekLabels(pts){ return pts.map(function(p){ return ['WK '+p.week, p.label.split('· ')[1]||'']; }); }
 
@@ -143,9 +132,8 @@
       var off = pts.map(function(p,i){ return rehActive[i] ? (p.offering==null?0:p.offering) : p.offering; });
       return { type:'bar', plugins: pdf ? [valueLabels0, blackBg] : [valueLabels0],
         data:{ labels:labels, datasets:[
-          { label:'Rehearsal attendance', data:att, flagHigh:true,
-            backgroundColor:'#1f5fff', borderColor:flagBorder(att).color, borderWidth:flagBorder(att).width,
-            borderRadius:3, maxBarThickness:34, yAxisID:'y' },
+          { label:'Rehearsal attendance', data:att,
+            backgroundColor:'#1f5fff', borderRadius:3, maxBarThickness:34, yAxisID:'y' },
           { label:'Offering (GHS)', data:off,
             backgroundColor:'#e2574c', borderRadius:3, maxBarThickness:34, yAxisID:'y1' }
         ]},
@@ -160,9 +148,8 @@
       var sun = pts.map(function(p,i){ return sunActive[i] ? (p.sunPresent==null?0:p.sunPresent) : p.sunPresent; });
       return { type:'bar', plugins: pdf ? [valueLabels0, blackBg] : [valueLabels0],
         data:{ labels:labels, datasets:[
-          { label:'Sunday attendance', data:sun, flagHigh:true,
-            backgroundColor:'#f5c518', borderColor:flagBorder(sun).color, borderWidth:flagBorder(sun).width,
-            borderRadius:3, maxBarThickness:34, yAxisID:'y' }
+          { label:'Sunday attendance', data:sun,
+            backgroundColor:'#f5c518', borderRadius:3, maxBarThickness:34, yAxisID:'y' }
         ]},
         options:{ responsive:!pdf, maintainAspectRatio:false, animation: pdf?false:{duration:400},
           plugins:{ legend:{display:false} },
