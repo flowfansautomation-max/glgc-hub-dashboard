@@ -63,7 +63,8 @@
       ['David Aseda Orleans-Lindsay', '0593435949'], ['Abraham Dogbe', null] ] },
 
     { choir: 'Steadfast Love Choir', governor: 'Johanna Nakoja', shepherds: [
-      ['Johanna Nakoja', '0545068460'], ['Fortune Esedinam Adiraki Gbolo', '0205508004'] ] },
+      ['Johanna Nakoja', '0545068460'], ['Fortune Esedinam Adiraki Gbolo', '0205508004'],
+      ['Faustina Wohoyi', null] ] },
 
     { choir: 'Steadfast Love Choir', governor: 'Joanita Djabatey', shepherds: [
       ['Joanita Djabatey', '0553833171'], ['Papa Yaw Ashun', '0551130050'] ] },
